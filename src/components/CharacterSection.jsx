@@ -1,8 +1,8 @@
 export default function CharacterSection({ characters }) {
   return (
     <section className="sidebar-section">
-      <h3>Character Section</h3>
-      <p className="sidebar-intro">Meet the immune cast. Each profile includes a short explanation and a learn-more link.</p>
+      <h3>Characters</h3>
+      <p className="sidebar-intro">Meet the immune cast and use these profiles as quick revision cards while reading.</p>
       <ul className="character-list" aria-label="Character list">
         {characters.map((character) => (
           <li key={character.id} className="character-list-item">

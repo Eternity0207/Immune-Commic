@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import CharacterIntroPage from "./components/CharacterIntroPage";
 import CreditsModal from "./components/CreditsModal";
 import Panel from "./components/Panel";
 import QuestionBlock from "./components/QuestionBlock";
@@ -12,6 +13,48 @@ const QUESTION_BY_PANEL = MID_STORY_QUESTIONS.reduce((accumulator, question) => 
   return accumulator;
 }, {});
 
+const CREDITS = {
+  projectTitle: "Immune System Comic",
+  professors: ["Dr. Sunil Lohar"],
+  teamMembers: ["Arsh Goyal", "Gyan Vardhan Chauhan"]
+};
+
+function getScorePercent(score, maxScore) {
+  if (!maxScore) {
+    return 0;
+  }
+
+  return Math.round((score / maxScore) * 100);
+}
+
+function getScoreMessage(score, maxScore) {
+  const scorePercent = getScorePercent(score, maxScore);
+
+  if (scorePercent >= 80) {
+    return "Great understanding!";
+  }
+
+  if (scorePercent >= 50) {
+    return "Good progress, keep exploring the story details.";
+  }
+
+  return "Try again to improve!";
+}
+
+function getScoreBadge(score, maxScore) {
+  const scorePercent = getScorePercent(score, maxScore);
+
+  if (scorePercent >= 85) {
+    return "Immune Expert";
+  }
+
+  if (scorePercent >= 60) {
+    return "Quick Learner";
+  }
+
+  return "";
+}
+
 export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCreditsOpen, setIsCreditsOpen] = useState(false);
@@ -19,17 +62,36 @@ export default function App() {
   const [playingPanelNumber, setPlayingPanelNumber] = useState(null);
   const [quizOpenRequest, setQuizOpenRequest] = useState(0);
   const [showFinalQuiz, setShowFinalQuiz] = useState(false);
+  const [hasEnteredStory, setHasEnteredStory] = useState(false);
+  const [checkpointScores, setCheckpointScores] = useState({});
+  const [comicSessionKey, setComicSessionKey] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [showScrollHint, setShowScrollHint] = useState(true);
+
   const narrationTokenRef = useRef(0);
   const preferredVoiceRef = useRef(null);
   const ttsPrimedRef = useRef(false);
   const fallbackNarrationRef = useRef(null);
   const { playSfx } = useUiAudio();
 
-  const panels = useMemo(
-    () => PANELS.map((panel) => ({ ...panel, terms: PANEL_TERMS[panel.number] ?? [] })),
-    []
-  );
+  const panels = useMemo(() => {
+    const storyPanels = PANELS.filter((panel) => panel.number >= 9);
+    const panelSource = storyPanels.length ? storyPanels : PANELS;
+
+    return panelSource.map((panel) => ({
+      ...panel,
+      terms: PANEL_TERMS[panel.number] ?? []
+    }));
+  }, []);
+
   const finalPanelNumber = panels[panels.length - 1]?.number;
+  const maximumCheckpointScore = MID_STORY_QUESTIONS.length * 10;
+  const checkpointScore = useMemo(
+    () => Object.values(checkpointScores).reduce((sum, value) => sum + value, 0),
+    [checkpointScores]
+  );
+  const scoreMessage = getScoreMessage(checkpointScore, maximumCheckpointScore);
+  const scoreBadge = getScoreBadge(checkpointScore, maximumCheckpointScore);
 
   const stopFallbackNarration = useCallback(() => {
     if (!fallbackNarrationRef.current) {
@@ -198,6 +260,16 @@ export default function App() {
     playSfx("tap", { volume: 0.35 });
   }, [playSfx]);
 
+  const handleContinueToStory = useCallback(() => {
+    playSfx("whoosh", { volume: 0.45, playbackRate: 0.95 });
+    setIsCreditsOpen(false);
+    setHasEnteredStory(true);
+
+    window.setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, 20);
+  }, [playSfx]);
+
   const handlePlayNarration = useCallback(
     (panel) => {
       speakPanelCaption(panel, { cueVolume: 1 });
@@ -211,7 +283,22 @@ export default function App() {
   }, [playSfx, stopNarration]);
 
   const handleQuestionAnswer = useCallback(
-    (isCorrect) => {
+    ({ questionId, isCorrect }) => {
+      if (!questionId) {
+        return;
+      }
+
+      setCheckpointScores((previous) => {
+        if (Object.prototype.hasOwnProperty.call(previous, questionId)) {
+          return previous;
+        }
+
+        return {
+          ...previous,
+          [questionId]: isCorrect ? 10 : 0
+        };
+      });
+
       playSfx(isCorrect ? "win" : "error", { volume: 0.42 });
     },
     [playSfx]
@@ -232,24 +319,62 @@ export default function App() {
     [playSfx]
   );
 
-  useEffect(() => {
-    const checkIfNearEnd = () => {
-      const triggerPoint = document.documentElement.scrollHeight - 850;
-      const currentPoint = window.scrollY + window.innerHeight;
+  const handleOpenFinalQuiz = useCallback(() => {
+    playSfx("whoosh", { volume: 0.42 });
+    setShowFinalQuiz(true);
+    setIsSidebarOpen(true);
+    setQuizOpenRequest((value) => value + 1);
+  }, [playSfx]);
 
-      if (currentPoint >= triggerPoint) {
+  const handleRestartComic = useCallback(() => {
+    playSfx("tap", { volume: 0.32 });
+    stopNarration();
+    setCheckpointScores({});
+    setShowFinalQuiz(false);
+    setQuizOpenRequest(0);
+    setIsSidebarOpen(false);
+    setIsCreditsOpen(false);
+    setActiveTermKey("");
+    setScrollProgress(0);
+    setShowScrollHint(true);
+    setComicSessionKey((value) => value + 1);
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [playSfx, stopNarration]);
+
+  useEffect(() => {
+    if (!hasEnteredStory) {
+      return;
+    }
+
+    const updateScrollMeta = () => {
+      const page = document.documentElement;
+      const maxScrollable = Math.max(page.scrollHeight - window.innerHeight, 1);
+      const progress = Math.min(100, Math.max(0, (window.scrollY / maxScrollable) * 100));
+
+      setScrollProgress(progress);
+
+      if (progress > 11) {
+        setShowScrollHint(false);
+      }
+
+      if (window.scrollY + window.innerHeight >= page.scrollHeight - 780) {
         setShowFinalQuiz(true);
       }
     };
 
-    checkIfNearEnd();
-    window.addEventListener("scroll", checkIfNearEnd, { passive: true });
+    updateScrollMeta();
+    window.addEventListener("scroll", updateScrollMeta, { passive: true });
+    window.addEventListener("resize", updateScrollMeta);
 
-    return () => window.removeEventListener("scroll", checkIfNearEnd);
-  }, []);
+    return () => {
+      window.removeEventListener("scroll", updateScrollMeta);
+      window.removeEventListener("resize", updateScrollMeta);
+    };
+  }, [comicSessionKey, hasEnteredStory]);
 
   useEffect(() => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+    if (!hasEnteredStory || typeof window === "undefined" || !("speechSynthesis" in window)) {
       return undefined;
     }
 
@@ -261,10 +386,10 @@ export default function App() {
 
     window.speechSynthesis.addEventListener("voiceschanged", handleVoicesChanged);
     return () => window.speechSynthesis.removeEventListener("voiceschanged", handleVoicesChanged);
-  }, [pickPreferredVoice]);
+  }, [hasEnteredStory, pickPreferredVoice]);
 
   useEffect(() => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+    if (!hasEnteredStory || typeof window === "undefined" || !("speechSynthesis" in window)) {
       return undefined;
     }
 
@@ -288,7 +413,7 @@ export default function App() {
 
     window.addEventListener("pointerdown", primeTts, { once: true });
     return () => window.removeEventListener("pointerdown", primeTts);
-  }, []);
+  }, [hasEnteredStory]);
 
   useEffect(() => {
     const closeOnEscape = (event) => {
@@ -310,8 +435,54 @@ export default function App() {
     };
   }, [stopNarration]);
 
+  if (!hasEnteredStory) {
+    return (
+      <div className="comic-app">
+        <button
+          type="button"
+          className="floating-credits-btn"
+          onClick={() => {
+            playTap();
+            setIsCreditsOpen(true);
+          }}
+        >
+          Credits
+        </button>
+
+        <CreditsModal isOpen={isCreditsOpen} onClose={() => setIsCreditsOpen(false)} onUiClick={playTap} />
+
+        <CharacterIntroPage characters={CHARACTERS} onContinue={handleContinueToStory} />
+      </div>
+    );
+  }
+
   return (
     <div className="comic-app">
+      <button
+        type="button"
+        className="floating-credits-btn"
+        onClick={() => {
+          playTap();
+          setIsCreditsOpen(true);
+        }}
+      >
+        Credits
+      </button>
+
+      <CreditsModal isOpen={isCreditsOpen} onClose={() => setIsCreditsOpen(false)} onUiClick={playTap} />
+
+      <div className="comic-progress-track" aria-hidden="true">
+        <div className="comic-progress-fill" style={{ width: `${scrollProgress}%` }} />
+      </div>
+
+      <p className="score-chip" aria-live="polite">
+        Score: {checkpointScore}
+      </p>
+
+      {scoreBadge ? <p className="score-badge">{scoreBadge}</p> : null}
+
+      {showScrollHint ? <p className="comic-scroll-hint">Scroll to explore the comic</p> : null}
+
       <button
         type="button"
         className="sidebar-toggle-btn"
@@ -335,38 +506,30 @@ export default function App() {
         quizOpenRequest={quizOpenRequest}
         onUiClick={playTap}
         onQuizAnswer={handleQuizAnswer}
+        credits={CREDITS}
+        resetSignal={comicSessionKey}
+        onOpenCredits={() => setIsCreditsOpen(true)}
       />
-
-      <button
-        type="button"
-        className="credits-toggle-btn"
-        onClick={() => {
-          playTap();
-          setIsCreditsOpen(true);
-        }}
-      >
-        Credits / About
-      </button>
-
-      <CreditsModal isOpen={isCreditsOpen} onClose={() => setIsCreditsOpen(false)} onUiClick={playTap} />
 
       <TermLearnMoreModal termKey={activeTermKey} onClose={() => setActiveTermKey("")} onUiClick={playTap} />
 
-      <header className="comic-header">
-        <p className="comic-kicker">Immune Comic Reader</p>
-        <h1>The Immune System Storyline</h1>
-        <p>
-          Scroll frame by frame. Pause at each checkpoint question and keep the sidebar open whenever you want
-          character context.
-        </p>
+      <header className="comic-header-banner">
+        <h1>Immune System Comic</h1>
       </header>
 
-      <main className="comic-feed">
+      <section className="comic-info-box" aria-label="Comic reading tips">
+        <h2>How to Explore</h2>
+        <ul>
+          <li>Scroll frame-by-frame through the comic panels.</li>
+          <li>Pause at each checkpoint question and answer carefully.</li>
+          <li>Open the sidebar anytime for quiz and character references.</li>
+          <li>Explore character context to strengthen your understanding.</li>
+        </ul>
+      </section>
+
+      <main key={`story-${comicSessionKey}`} className="comic-feed">
         {panels.map((panel) => (
           <section key={panel.number} className="comic-segment">
-            {panel.number === 1 ? <p className="section-flow-label">Character Introduction Panels</p> : null}
-            {panel.number === 9 ? <p className="section-flow-label">Story Panels Begin</p> : null}
-
             <Panel
               panel={panel}
               onTermClick={handleOpenTerm}
@@ -374,25 +537,28 @@ export default function App() {
               onNarrationPlay={handlePlayNarration}
               onNarrationPause={handlePauseNarration}
             />
+
             {QUESTION_BY_PANEL[panel.number] ? (
               <QuestionBlock question={QUESTION_BY_PANEL[panel.number]} onAnswerSelect={handleQuestionAnswer} />
             ) : null}
 
             {panel.number === finalPanelNumber ? (
-              <div className="final-quiz-entry">
-                <p className="final-quiz-entry-text">You reached the final panel. Ready to test your full understanding?</p>
-                <button
-                  type="button"
-                  className="final-quiz-entry-btn"
-                  onClick={() => {
-                    playSfx("whoosh", { volume: 0.4 });
-                    setShowFinalQuiz(true);
-                    setIsSidebarOpen(true);
-                    setQuizOpenRequest((value) => value + 1);
-                  }}
-                >
-                  Take Final Quiz
-                </button>
+              <div className="comic-end-summary">
+                <p className="comic-end-kicker">Comic Complete</p>
+                <h3>
+                  Total Score: {checkpointScore}/{maximumCheckpointScore}
+                </h3>
+                <p className="comic-end-message">{scoreMessage}</p>
+                {scoreBadge ? <p className="comic-end-badge">Badge Earned: {scoreBadge}</p> : null}
+
+                <div className="comic-end-actions">
+                  <button type="button" className="comic-end-btn" onClick={handleOpenFinalQuiz}>
+                    Take Final Quiz
+                  </button>
+                  <button type="button" className="comic-end-btn is-secondary" onClick={handleRestartComic}>
+                    Restart Comic
+                  </button>
+                </div>
               </div>
             ) : null}
           </section>

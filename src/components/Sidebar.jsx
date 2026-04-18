@@ -2,6 +2,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import CharacterSection from "./CharacterSection";
 import { shuffleOptions } from "../lib/shuffleOptions";
 
+const CREDIT_LINKS = {
+  "Dr. Sunil Lohar": "https://iitj.ac.in/People/Profile/5ee5e2a2-ebcc-471c-9287-3987cdac57e2",
+  "Arsh Goyal": "https://www.linkedin.com/in/arshgoyal0607/",
+  "Gyan Vardhan Chauhan": "https://www.linkedin.com/in/gyan-vardhan-chauhan/"
+};
+
 function getQuizMessage(score, total) {
   if (total === 0) {
     return "";
@@ -22,7 +28,10 @@ export default function Sidebar({
   quizQuestions,
   quizOpenRequest,
   onUiClick,
-  onQuizAnswer
+  onQuizAnswer,
+  credits,
+  resetSignal,
+  onOpenCredits
 }) {
   const [answers, setAnswers] = useState({});
   const finalQuizSectionRef = useRef(null);
@@ -50,12 +59,16 @@ export default function Sidebar({
     finalQuizSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [isOpen, showFinalQuiz, quizOpenRequest]);
 
+  useEffect(() => {
+    setAnswers({});
+  }, [resetSignal]);
+
   return (
     <>
       <aside className={`comic-sidebar ${isOpen ? "is-open" : ""}`} aria-label="Comic resources sidebar">
         <header className="comic-sidebar-header">
           <p className="comic-sidebar-kicker">Guidebook</p>
-          <h2>Characters + Final Quiz</h2>
+          <h2>Characters, Quiz, Credits</h2>
           <button
             type="button"
             className="close-sidebar-btn"
@@ -72,7 +85,7 @@ export default function Sidebar({
         <CharacterSection characters={characters} />
 
         <section ref={finalQuizSectionRef} className={`sidebar-section final-quiz-section ${showFinalQuiz ? "is-visible" : "is-locked"}`}>
-          <h3>Final Quiz</h3>
+          <h3>Quiz</h3>
           {showFinalQuiz ? (
             <>
               <p className="sidebar-intro">Answer all questions based on the full story arc.</p>
@@ -134,6 +147,75 @@ export default function Sidebar({
           ) : (
             <p className="quiz-locked-message">Scroll near the end of the comic to unlock the final quiz.</p>
           )}
+        </section>
+
+        <section className="sidebar-section credits-section">
+          <h3>Credits</h3>
+          <article className="sidebar-credits-card">
+            <p className="sidebar-credits-label">Project</p>
+            <p className="sidebar-credits-value">{credits?.projectTitle}</p>
+
+            <p className="sidebar-credits-label">Professors</p>
+            {(credits?.professors ?? []).map((professor) => {
+              const profileUrl = CREDIT_LINKS[professor];
+
+              if (!profileUrl) {
+                return (
+                  <p key={professor} className="sidebar-credits-value">
+                    {professor}
+                  </p>
+                );
+              }
+
+              return (
+                <a
+                  key={professor}
+                  className="sidebar-credits-link"
+                  href={profileUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {professor}
+                </a>
+              );
+            })}
+
+            <p className="sidebar-credits-label">Team Members</p>
+            {(credits?.teamMembers ?? []).map((member) => {
+              const profileUrl = CREDIT_LINKS[member];
+
+              if (!profileUrl) {
+                return (
+                  <p key={member} className="sidebar-credits-value">
+                    {member}
+                  </p>
+                );
+              }
+
+              return (
+                <a
+                  key={member}
+                  className="sidebar-credits-link"
+                  href={profileUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {member}
+                </a>
+              );
+            })}
+
+            <button
+              type="button"
+              className="sidebar-credits-open-btn"
+              onClick={() => {
+                onUiClick?.();
+                onOpenCredits?.();
+              }}
+            >
+              Open Credits
+            </button>
+          </article>
         </section>
       </aside>
 

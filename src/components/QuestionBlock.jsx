@@ -37,10 +37,16 @@ export default function QuestionBlock({ question, onAnswerSelect }) {
               type="button"
               className={optionClassName}
               onClick={() => {
+                if (hasAnswered) {
+                  return;
+                }
+
+                const answeredCorrectly = option.id === question.correctOptionId;
                 setSelectedOptionId(option.id);
-                onAnswerSelect?.(option.id === question.correctOptionId);
+                onAnswerSelect?.({ questionId: question.id, isCorrect: answeredCorrectly });
               }}
               aria-pressed={isSelected}
+              disabled={hasAnswered}
             >
               {option.text}
             </button>
@@ -50,7 +56,7 @@ export default function QuestionBlock({ question, onAnswerSelect }) {
 
       {hasAnswered ? (
         <p className={`question-feedback ${isCorrect ? "is-correct" : "is-wrong"}`}>
-          {isCorrect ? "Correct. " : "Not quite. "}
+          {isCorrect ? "Correct. +10 points. " : "Not quite. +0 points. "}
           {selectedOption?.explanation}
         </p>
       ) : (

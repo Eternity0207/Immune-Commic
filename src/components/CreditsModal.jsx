@@ -1,3 +1,9 @@
+const CREDIT_LINKS = {
+  "Dr. Sunil Lohar": "https://iitj.ac.in/People/Profile/5ee5e2a2-ebcc-471c-9287-3987cdac57e2",
+  "Arsh Goyal": "https://www.linkedin.com/in/arshgoyal0607/",
+  "Gyan Vardhan Chauhan": "https://www.linkedin.com/in/gyan-vardhan-chauhan/"
+};
+
 export default function CreditsModal({ isOpen, onClose, onUiClick }) {
   if (!isOpen) {
     return null;
@@ -25,13 +31,29 @@ export default function CreditsModal({ isOpen, onClose, onUiClick }) {
 
         <div className="credits-group">
           <p className="credits-label">Professor</p>
-          <p className="credits-value">Dr. Sunil Lohar</p>
+          <a
+            className="credits-link"
+            href={CREDIT_LINKS["Dr. Sunil Lohar"]}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Dr. Sunil Lohar
+          </a>
         </div>
 
         <div className="credits-group">
           <p className="credits-label">Students</p>
-          <p className="credits-value">Arsh Goyal</p>
-          <p className="credits-value">Gyan Vardhan Chauhan</p>
+          <a className="credits-link" href={CREDIT_LINKS["Arsh Goyal"]} target="_blank" rel="noreferrer">
+            Arsh Goyal
+          </a>
+          <a
+            className="credits-link"
+            href={CREDIT_LINKS["Gyan Vardhan Chauhan"]}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Gyan Vardhan Chauhan
+          </a>
         </div>
 
         <button
