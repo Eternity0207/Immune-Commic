@@ -8,16 +8,48 @@ import TermLearnMoreModal from "./components/TermLearnMoreModal";
 import useUiAudio from "./hooks/useUiAudio";
 import { CHARACTERS, FINAL_QUIZ, MID_STORY_QUESTIONS, PANELS, PANEL_TERMS } from "./lib/storyData";
 
-const QUESTION_BY_PANEL = MID_STORY_QUESTIONS.reduce((accumulator, question) => {
-  accumulator[question.insertAfter] = question;
-  return accumulator;
-}, {});
+const CHAPTERS = {
+  chapter1: {
+    key: "chapter1",
+    path: "/chapter-1",
+    title: "Chapter 1: The First Alarm",
+    startPanel: 9,
+    endPanel: 29
+  },
+  chapter2: {
+    key: "chapter2",
+    path: "/chapter-2",
+    title: "Chapter 2: The Adaptive Arm Awakens",
+    startPanel: 30,
+    endPanel: 48
+  }
+};
+
+const VALID_PATHS = ["/", CHAPTERS.chapter1.path, CHAPTERS.chapter2.path];
+
+const REVIEW_LINKS = [
+  { label: "T cell", href: "https://en.wikipedia.org/wiki/T_cell" },
+  { label: "B cell", href: "https://en.wikipedia.org/wiki/B_cell" },
+  { label: "Antibody", href: "https://en.wikipedia.org/wiki/Antibody" }
+];
 
 const CREDITS = {
   projectTitle: "Immune System Comic",
+  institution: "Developed at IIT Jodhpur (Indian Institute of Technology Jodhpur)",
   professors: ["Dr. Sunil Lohar"],
   teamMembers: ["Arsh Goyal", "Gyan Vardhan Chauhan"]
 };
+
+function normalizePath(pathname) {
+  return VALID_PATHS.includes(pathname) ? pathname : "/";
+}
+
+function mapQuestionsByPanel(questions) {
+  return questions.reduce((accumulator, question) => {
+    accumulator[question.insertAfter] = question;
+    return accumulator;
+  }, {});
+}
 
 function getScorePercent(score, maxScore) {
   if (!maxScore) {
@@ -56,15 +88,17 @@ function getScoreBadge(score, maxScore) {
 }
 
 export default function App() {
+  const [currentPath, setCurrentPath] = useState(() =>
+    typeof window === "undefined" ? "/" : normalizePath(window.location.pathname)
+  );
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCreditsOpen, setIsCreditsOpen] = useState(false);
   const [activeTermKey, setActiveTermKey] = useState("");
   const [playingPanelNumber, setPlayingPanelNumber] = useState(null);
   const [quizOpenRequest, setQuizOpenRequest] = useState(0);
-  const [showFinalQuiz, setShowFinalQuiz] = useState(false);
   const [hasEnteredStory, setHasEnteredStory] = useState(false);
-  const [checkpointScores, setCheckpointScores] = useState({});
-  const [comicSessionKey, setComicSessionKey] = useState(0);
+  const [chapterScores, setChapterScores] = useState({ chapter1: {}, chapter2: {} });
+  const [chapterResetKeys, setChapterResetKeys] = useState({ chapter1: 0, chapter2: 0 });
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showScrollHint, setShowScrollHint] = useState(true);
 
@@ -74,24 +108,125 @@ export default function App() {
   const fallbackNarrationRef = useRef(null);
   const { playSfx } = useUiAudio();
 
-  const panels = useMemo(() => {
-    const storyPanels = PANELS.filter((panel) => panel.number >= 9);
-    const panelSource = storyPanels.length ? storyPanels : PANELS;
-
-    return panelSource.map((panel) => ({
-      ...panel,
-      terms: PANEL_TERMS[panel.number] ?? []
-    }));
-  }, []);
-
-  const finalPanelNumber = panels[panels.length - 1]?.number;
-  const maximumCheckpointScore = MID_STORY_QUESTIONS.length * 10;
-  const checkpointScore = useMemo(
-    () => Object.values(checkpointScores).reduce((sum, value) => sum + value, 0),
-    [checkpointScores]
+  const chapter1Panels = useMemo(
+    () =>
+      PANELS.filter(
+        (panel) => panel.number >= CHAPTERS.chapter1.startPanel && panel.number <= CHAPTERS.chapter1.endPanel
+      ).map((panel) => ({
+        ...panel,
+        terms: PANEL_TERMS[panel.number] ?? []
+      })),
+    []
   );
-  const scoreMessage = getScoreMessage(checkpointScore, maximumCheckpointScore);
-  const scoreBadge = getScoreBadge(checkpointScore, maximumCheckpointScore);
+
+  const chapter2Panels = useMemo(
+    () =>
+      PANELS.filter(
+        (panel) => panel.number >= CHAPTERS.chapter2.startPanel && panel.number <= CHAPTERS.chapter2.endPanel
+      ).map((panel) => ({
+        ...panel,
+        terms: PANEL_TERMS[panel.number] ?? []
+      })),
+    []
+  );
+
+  const chapter1Questions = useMemo(
+    () =>
+      MID_STORY_QUESTIONS.filter(
+        (question) =>
+          question.insertAfter >= CHAPTERS.chapter1.startPanel &&
+          question.insertAfter <= CHAPTERS.chapter1.endPanel
+      ),
+    []
+  );
+
+  const chapter2Questions = useMemo(
+    () =>
+      MID_STORY_QUESTIONS.filter(
+        (question) =>
+          question.insertAfter >= CHAPTERS.chapter2.startPanel &&
+          question.insertAfter <= CHAPTERS.chapter2.endPanel
+      ),
+    []
+  );
+
+  const chapter1QuestionByPanel = useMemo(() => mapQuestionsByPanel(chapter1Questions), [chapter1Questions]);
+  const chapter2QuestionByPanel = useMemo(() => mapQuestionsByPanel(chapter2Questions), [chapter2Questions]);
+
+  const totalQuestionsChapter1 = chapter1Questions.length;
+  const totalQuestionsChapter2 = chapter2Questions.length;
+  const chapter1TotalMarks = totalQuestionsChapter1 * 10;
+  const chapter2TotalMarks = totalQuestionsChapter2 * 10;
+
+  const chapter1Score = useMemo(
+    () => Object.values(chapterScores.chapter1).reduce((sum, value) => sum + value, 0),
+    [chapterScores.chapter1]
+  );
+  const chapter2Score = useMemo(
+    () => Object.values(chapterScores.chapter2).reduce((sum, value) => sum + value, 0),
+    [chapterScores.chapter2]
+  );
+
+  const chapter1Percent = getScorePercent(chapter1Score, chapter1TotalMarks);
+  const chapter2Percent = getScorePercent(chapter2Score, chapter2TotalMarks);
+  const chapter1Passed = chapter1Percent >= 50;
+  const chapter2Passed = chapter2Percent >= 50;
+  const isFinalQuizUnlocked = chapter1Passed && chapter2Passed;
+
+  const activeChapter = useMemo(() => {
+    if (currentPath === CHAPTERS.chapter1.path) {
+      return CHAPTERS.chapter1;
+    }
+
+    if (currentPath === CHAPTERS.chapter2.path) {
+      return CHAPTERS.chapter2;
+    }
+
+    return null;
+  }, [currentPath]);
+
+  const activeChapterKey = activeChapter?.key;
+
+  const activePanels = useMemo(() => {
+    if (activeChapterKey === "chapter1") {
+      return chapter1Panels;
+    }
+
+    if (activeChapterKey === "chapter2") {
+      return chapter2Panels;
+    }
+
+    return [];
+  }, [activeChapterKey, chapter1Panels, chapter2Panels]);
+
+  const activeQuestionByPanel = activeChapterKey === "chapter1" ? chapter1QuestionByPanel : chapter2QuestionByPanel;
+  const activeFinalPanelNumber = activePanels[activePanels.length - 1]?.number;
+  const activeChapterResetKey = activeChapterKey ? chapterResetKeys[activeChapterKey] : 0;
+
+  const activeChapterScore = activeChapterKey === "chapter1" ? chapter1Score : chapter2Score;
+  const activeChapterTotalMarks = activeChapterKey === "chapter1" ? chapter1TotalMarks : chapter2TotalMarks;
+  const activeChapterScoreMessage = getScoreMessage(activeChapterScore, activeChapterTotalMarks);
+  const activeChapterScoreBadge = getScoreBadge(activeChapterScore, activeChapterTotalMarks);
+
+  const sidebarResetSignal = chapterResetKeys.chapter1 + chapterResetKeys.chapter2;
+
+  const navigateTo = useCallback((nextPath, { replace = false } = {}) => {
+    const normalizedPath = normalizePath(nextPath);
+
+    if (typeof window !== "undefined") {
+      if (replace) {
+        window.history.replaceState({}, "", normalizedPath);
+      } else if (window.location.pathname !== normalizedPath) {
+        window.history.pushState({}, "", normalizedPath);
+      }
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    setCurrentPath(normalizedPath);
+    setScrollProgress(0);
+    setShowScrollHint(true);
+  }, []);
 
   const stopFallbackNarration = useCallback(() => {
     if (!fallbackNarrationRef.current) {
@@ -260,15 +395,29 @@ export default function App() {
     playSfx("tap", { volume: 0.35 });
   }, [playSfx]);
 
+  const handlePathChange = useCallback(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    setCurrentPath(normalizePath(window.location.pathname));
+  }, []);
+
+  const handleContinueToChapter2 = useCallback(() => {
+    if (!chapter1Passed) {
+      return;
+    }
+
+    playSfx("whoosh", { volume: 0.42 });
+    navigateTo(CHAPTERS.chapter2.path);
+  }, [chapter1Passed, navigateTo, playSfx]);
+
   const handleContinueToStory = useCallback(() => {
     playSfx("whoosh", { volume: 0.45, playbackRate: 0.95 });
     setIsCreditsOpen(false);
     setHasEnteredStory(true);
-
-    window.setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }, 20);
-  }, [playSfx]);
+    navigateTo(CHAPTERS.chapter1.path);
+  }, [navigateTo, playSfx]);
 
   const handlePlayNarration = useCallback(
     (panel) => {
@@ -283,19 +432,24 @@ export default function App() {
   }, [playSfx, stopNarration]);
 
   const handleQuestionAnswer = useCallback(
-    ({ questionId, isCorrect }) => {
-      if (!questionId) {
+    ({ questionId, isCorrect, chapterKey }) => {
+      if (!questionId || !chapterKey) {
         return;
       }
 
-      setCheckpointScores((previous) => {
-        if (Object.prototype.hasOwnProperty.call(previous, questionId)) {
+      setChapterScores((previous) => {
+        const currentChapterScores = previous[chapterKey] ?? {};
+
+        if (Object.prototype.hasOwnProperty.call(currentChapterScores, questionId)) {
           return previous;
         }
 
         return {
           ...previous,
-          [questionId]: isCorrect ? 10 : 0
+          [chapterKey]: {
+            ...currentChapterScores,
+            [questionId]: isCorrect ? 10 : 0
+          }
         };
       });
 
@@ -320,30 +474,74 @@ export default function App() {
   );
 
   const handleOpenFinalQuiz = useCallback(() => {
+    if (!isFinalQuizUnlocked) {
+      return;
+    }
+
     playSfx("whoosh", { volume: 0.42 });
-    setShowFinalQuiz(true);
     setIsSidebarOpen(true);
     setQuizOpenRequest((value) => value + 1);
-  }, [playSfx]);
+  }, [isFinalQuizUnlocked, playSfx]);
 
-  const handleRestartComic = useCallback(() => {
+  const handleRetryChapter = useCallback((chapterKey) => {
     playSfx("tap", { volume: 0.32 });
     stopNarration();
-    setCheckpointScores({});
-    setShowFinalQuiz(false);
+
+    setChapterScores((previous) => {
+      const next = {
+        ...previous,
+        [chapterKey]: {}
+      };
+
+      if (chapterKey === "chapter1") {
+        next.chapter2 = {};
+      }
+
+      return next;
+    });
+
+    setChapterResetKeys((previous) => {
+      const next = {
+        ...previous,
+        [chapterKey]: previous[chapterKey] + 1
+      };
+
+      if (chapterKey === "chapter1") {
+        next.chapter2 = previous.chapter2 + 1;
+      }
+
+      return next;
+    });
+
     setQuizOpenRequest(0);
     setIsSidebarOpen(false);
     setIsCreditsOpen(false);
     setActiveTermKey("");
-    setScrollProgress(0);
-    setShowScrollHint(true);
-    setComicSessionKey((value) => value + 1);
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [playSfx, stopNarration]);
+    navigateTo(chapterKey === "chapter1" ? CHAPTERS.chapter1.path : CHAPTERS.chapter2.path);
+  }, [navigateTo, playSfx, stopNarration]);
 
   useEffect(() => {
-    if (!hasEnteredStory) {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    window.addEventListener("popstate", handlePathChange);
+    return () => window.removeEventListener("popstate", handlePathChange);
+  }, [handlePathChange]);
+
+  useEffect(() => {
+    if (!hasEnteredStory && currentPath !== "/") {
+      navigateTo("/", { replace: true });
+      return;
+    }
+
+    if (currentPath === CHAPTERS.chapter2.path && !chapter1Passed) {
+      navigateTo(CHAPTERS.chapter1.path, { replace: true });
+    }
+  }, [chapter1Passed, currentPath, hasEnteredStory, navigateTo]);
+
+  useEffect(() => {
+    if (!hasEnteredStory || !activeChapterKey) {
       return;
     }
 
@@ -357,10 +555,6 @@ export default function App() {
       if (progress > 11) {
         setShowScrollHint(false);
       }
-
-      if (window.scrollY + window.innerHeight >= page.scrollHeight - 780) {
-        setShowFinalQuiz(true);
-      }
     };
 
     updateScrollMeta();
@@ -371,10 +565,10 @@ export default function App() {
       window.removeEventListener("scroll", updateScrollMeta);
       window.removeEventListener("resize", updateScrollMeta);
     };
-  }, [comicSessionKey, hasEnteredStory]);
+  }, [activeChapterKey, activeChapterResetKey, hasEnteredStory]);
 
   useEffect(() => {
-    if (!hasEnteredStory || typeof window === "undefined" || !("speechSynthesis" in window)) {
+    if (!activeChapterKey || typeof window === "undefined" || !("speechSynthesis" in window)) {
       return undefined;
     }
 
@@ -386,10 +580,10 @@ export default function App() {
 
     window.speechSynthesis.addEventListener("voiceschanged", handleVoicesChanged);
     return () => window.speechSynthesis.removeEventListener("voiceschanged", handleVoicesChanged);
-  }, [hasEnteredStory, pickPreferredVoice]);
+  }, [activeChapterKey, pickPreferredVoice]);
 
   useEffect(() => {
-    if (!hasEnteredStory || typeof window === "undefined" || !("speechSynthesis" in window)) {
+    if (!activeChapterKey || typeof window === "undefined" || !("speechSynthesis" in window)) {
       return undefined;
     }
 
@@ -413,7 +607,7 @@ export default function App() {
 
     window.addEventListener("pointerdown", primeTts, { once: true });
     return () => window.removeEventListener("pointerdown", primeTts);
-  }, [hasEnteredStory]);
+  }, [activeChapterKey]);
 
   useEffect(() => {
     const closeOnEscape = (event) => {
@@ -435,7 +629,91 @@ export default function App() {
     };
   }, [stopNarration]);
 
-  if (!hasEnteredStory) {
+  const renderReviewLinks = () => (
+    <div className="chapter-review-links" aria-label="Review concepts">
+      <p>Review Concepts</p>
+      <div className="chapter-review-link-list">
+        {REVIEW_LINKS.map((link) => (
+          <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
+            {link.label}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderChapterEndSummary = () => {
+    if (!activeChapterKey) {
+      return null;
+    }
+
+    if (activeChapterKey === "chapter1") {
+      return (
+        <div className="comic-end-summary">
+          <p className="comic-end-kicker">Chapter 1 Complete</p>
+          <h3>
+            Score: {chapter1Score}/{chapter1TotalMarks} ({chapter1Percent}%)
+          </h3>
+          {chapter1Passed ? (
+            <p className="comic-end-message">{activeChapterScoreMessage}</p>
+          ) : (
+            <p className="chapter-gate-warning">You need at least 50% to proceed</p>
+          )}
+
+          <div className="comic-end-actions">
+            {chapter1Passed ? (
+              <button type="button" className="comic-end-btn" onClick={handleContinueToChapter2}>
+                Continue to Chapter 2
+              </button>
+            ) : (
+              <button type="button" className="comic-end-btn is-secondary" onClick={() => handleRetryChapter("chapter1")}>
+                Retry Chapter 1
+              </button>
+            )}
+          </div>
+
+          {!chapter1Passed ? renderReviewLinks() : null}
+        </div>
+      );
+    }
+
+    const canTakeFinalQuiz = chapter2Passed && isFinalQuizUnlocked;
+
+    return (
+      <div className="comic-end-summary">
+        <p className="comic-end-kicker">Chapter 2 Complete</p>
+        <h3>
+          Score: {chapter2Score}/{chapter2TotalMarks} ({chapter2Percent}%)
+        </h3>
+
+        {chapter2Passed ? (
+          <p className="comic-end-message">{activeChapterScoreMessage}</p>
+        ) : (
+          <p className="chapter-gate-warning">You need at least 50% to proceed</p>
+        )}
+
+        <div className="comic-end-actions">
+          <button type="button" className="comic-end-btn" onClick={handleOpenFinalQuiz} disabled={!canTakeFinalQuiz}>
+            Take Final Quiz
+          </button>
+
+          {!chapter2Passed ? (
+            <button type="button" className="comic-end-btn is-secondary" onClick={() => handleRetryChapter("chapter2")}>
+              Retry Chapter 2
+            </button>
+          ) : null}
+        </div>
+
+        {!canTakeFinalQuiz ? (
+          <p className="chapter-quiz-lock-note">Complete both chapters with at least 50% to unlock quiz</p>
+        ) : null}
+
+        {!chapter2Passed ? renderReviewLinks() : null}
+      </div>
+    );
+  };
+
+  if (!hasEnteredStory || currentPath === "/") {
     return (
       <div className="comic-app">
         <button
@@ -476,12 +754,12 @@ export default function App() {
       </div>
 
       <p className="score-chip" aria-live="polite">
-        Score: {checkpointScore}
+        Score: {activeChapterScore}
       </p>
 
-      {scoreBadge ? <p className="score-badge">{scoreBadge}</p> : null}
+      {activeChapterScoreBadge ? <p className="score-badge">{activeChapterScoreBadge}</p> : null}
 
-      {showScrollHint ? <p className="comic-scroll-hint">Scroll to explore the comic</p> : null}
+      {showScrollHint ? <p className="comic-scroll-hint">Scroll to explore this chapter</p> : null}
 
       <button
         type="button"
@@ -501,13 +779,13 @@ export default function App() {
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
         characters={CHARACTERS}
-        showFinalQuiz={showFinalQuiz}
+        showFinalQuiz={isFinalQuizUnlocked}
         quizQuestions={FINAL_QUIZ}
         quizOpenRequest={quizOpenRequest}
         onUiClick={playTap}
         onQuizAnswer={handleQuizAnswer}
         credits={CREDITS}
-        resetSignal={comicSessionKey}
+        resetSignal={sidebarResetSignal}
         onOpenCredits={() => setIsCreditsOpen(true)}
       />
 
@@ -517,18 +795,23 @@ export default function App() {
         <h1>Immune System Comic</h1>
       </header>
 
+      <section className="chapter-title-banner" aria-label="Current chapter">
+        <p className="chapter-title-kicker">{activeChapter?.key === "chapter1" ? "Chapter 1" : "Chapter 2"}</p>
+        <h2>{activeChapter?.title}</h2>
+      </section>
+
       <section className="comic-info-box" aria-label="Comic reading tips">
         <h2>How to Explore</h2>
         <ul>
           <li>Scroll frame-by-frame through the comic panels.</li>
-          <li>Pause at each checkpoint question and answer carefully.</li>
+          <li>Each checkpoint question is worth 10 points.</li>
+          <li>You need at least 50% in each chapter to unlock the next stage.</li>
           <li>Open the sidebar anytime for quiz and character references.</li>
-          <li>Explore character context to strengthen your understanding.</li>
         </ul>
       </section>
 
-      <main key={`story-${comicSessionKey}`} className="comic-feed">
-        {panels.map((panel) => (
+      <main key={`story-${activeChapterKey}-${activeChapterResetKey}`} className="comic-feed">
+        {activePanels.map((panel) => (
           <section key={panel.number} className="comic-segment">
             <Panel
               panel={panel}
@@ -538,29 +821,14 @@ export default function App() {
               onNarrationPause={handlePauseNarration}
             />
 
-            {QUESTION_BY_PANEL[panel.number] ? (
-              <QuestionBlock question={QUESTION_BY_PANEL[panel.number]} onAnswerSelect={handleQuestionAnswer} />
+            {activeQuestionByPanel[panel.number] ? (
+              <QuestionBlock
+                question={activeQuestionByPanel[panel.number]}
+                onAnswerSelect={(payload) => handleQuestionAnswer({ ...payload, chapterKey: activeChapterKey })}
+              />
             ) : null}
 
-            {panel.number === finalPanelNumber ? (
-              <div className="comic-end-summary">
-                <p className="comic-end-kicker">Comic Complete</p>
-                <h3>
-                  Total Score: {checkpointScore}/{maximumCheckpointScore}
-                </h3>
-                <p className="comic-end-message">{scoreMessage}</p>
-                {scoreBadge ? <p className="comic-end-badge">Badge Earned: {scoreBadge}</p> : null}
-
-                <div className="comic-end-actions">
-                  <button type="button" className="comic-end-btn" onClick={handleOpenFinalQuiz}>
-                    Take Final Quiz
-                  </button>
-                  <button type="button" className="comic-end-btn is-secondary" onClick={handleRestartComic}>
-                    Restart Comic
-                  </button>
-                </div>
-              </div>
-            ) : null}
+            {panel.number === activeFinalPanelNumber ? renderChapterEndSummary() : null}
           </section>
         ))}
       </main>

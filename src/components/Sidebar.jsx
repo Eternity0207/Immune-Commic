@@ -145,7 +145,7 @@ export default function Sidebar({
               </div>
             </>
           ) : (
-            <p className="quiz-locked-message">Scroll near the end of the comic to unlock the final quiz.</p>
+            <p className="quiz-locked-message">Complete both chapters with at least 50% to unlock quiz</p>
           )}
         </section>
 
@@ -154,6 +154,7 @@ export default function Sidebar({
           <article className="sidebar-credits-card">
             <p className="sidebar-credits-label">Project</p>
             <p className="sidebar-credits-value">{credits?.projectTitle}</p>
+            {credits?.institution ? <p className="sidebar-credits-value">{credits.institution}</p> : null}
 
             <p className="sidebar-credits-label">Professors</p>
             {(credits?.professors ?? []).map((professor) => {

@@ -27,6 +27,7 @@ export default function CreditsModal({ isOpen, onClose, onUiClick }) {
         <div className="credits-group">
           <p className="credits-label">Project Title</p>
           <p className="credits-value">Immune System Comic Learning Experience</p>
+          <p className="credits-value">Developed at IIT Jodhpur (Indian Institute of Technology Jodhpur)</p>
         </div>
 
         <div className="credits-group">
