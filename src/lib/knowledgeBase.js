@@ -1,0 +1,68 @@
+export const KNOWLEDGE_BASE = {
+  t_cell: {
+    title: "T Cell",
+    description:
+      "T cells recognize infected cells and coordinate targeted immune defense when danger signals appear.",
+    link: "https://en.wikipedia.org/wiki/T_cell",
+  },
+  b_cell: {
+    title: "B Cell",
+    description:
+      "B cells produce antibodies that bind pathogens and help the body clear them faster.",
+    link: "https://en.wikipedia.org/wiki/B_cell",
+  },
+  antibody: {
+    title: "Antibody",
+    description:
+      "Antibodies are proteins that lock onto specific foreign patterns and mark threats for elimination.",
+    link: "https://en.wikipedia.org/wiki/Antibody",
+  },
+  antigen: {
+    title: "Antigen",
+    description:
+      "An antigen is a recognizable foreign molecular pattern that can trigger an immune response.",
+    link: "https://en.wikipedia.org/wiki/Antigen",
+  },
+  macrophage: {
+    title: "Macrophage",
+    description:
+      "Macrophages engulf pathogens and debris, then present clues that guide adaptive immunity.",
+    link: "https://en.wikipedia.org/wiki/Macrophage",
+  },
+  neutrophil: {
+    title: "Neutrophil",
+    description:
+      "Neutrophils are rapid first responders that quickly arrive and attack invading microbes.",
+    link: "https://en.wikipedia.org/wiki/Neutrophil",
+  },
+  helper_t_cell: {
+    title: "Helper T Cell",
+    description:
+      "Helper T cells coordinate other immune cells by releasing signals that organize defense.",
+    link: "https://en.wikipedia.org/wiki/T_helper_cell",
+  },
+  cytotoxic_t_cell: {
+    title: "Cytotoxic T Cell",
+    description:
+      "Cytotoxic T cells directly destroy infected cells to stop internal pathogen spread.",
+    link: "https://en.wikipedia.org/wiki/Cytotoxic_T_cell",
+  },
+  memory_cell: {
+    title: "Memory Cell",
+    description:
+      "Memory cells store pathogen patterns so future responses become faster and stronger.",
+    link: "https://en.wikipedia.org/wiki/Immunological_memory",
+  },
+  self_marker: {
+    title: "Self Marker",
+    description:
+      "Self markers help immune cells identify healthy body tissue and avoid unnecessary attack.",
+    link: "https://en.wikipedia.org/wiki/Self-antigen",
+  },
+  non_self_pattern: {
+    title: "Non-Self Pattern",
+    description:
+      "Foreign patterns signal possible infection and trigger recognition pathways in immune cells.",
+    link: "https://en.wikipedia.org/wiki/Pattern_recognition_receptor",
+  },
+};
