@@ -1,6 +1,6 @@
 # Immune Cinematic Comic (Vite + React)
 
-Single-page cinematic comic experience built with React, Vite, Tailwind CSS, and Framer Motion.
+Interactive comic experience built with React and Vite, including per-panel narration controls and quizzes.
 
 ## Stack
 
@@ -8,8 +8,9 @@ Single-page cinematic comic experience built with React, Vite, Tailwind CSS, and
 - React
 - Tailwind CSS
 - Framer Motion
+- `google-tts-api` (for narration fallback audio)
 
-## Run locally
+## Local Development
 
 ```bash
 cd /home/mani/H4Ck5R/DC
@@ -17,19 +18,21 @@ npm install
 npm run dev
 ```
 
-## Build
+`npm run dev` now runs everything needed, including the `/api/tts` endpoint via Vite middleware.
+
+## Vercel Deployment
+
+Push this repository to GitHub and import it in Vercel.
+
+- Build command: `npm run build`
+- Output directory: `dist`
+- API endpoint: `/api/tts` (implemented in `api/tts.js`)
+
+No extra backend process is required on Vercel.
+
+## Build (Optional)
 
 ```bash
 npm run build
 npm run preview
 ```
-
-## Current structure
-
-- `src/App.jsx`: main stage flow (`intro -> characters -> story`) and panel navigation state
-- `src/components/Hero.jsx`: intro hero section
-- `src/components/Characters.jsx`: character selection scene
-- `src/components/Story.jsx`: story scene wrapper and progress UI
-- `src/components/Panel.jsx`: fullscreen panel renderer
-- `public/assets/characters`: character images (`char1..char10`)
-- `public/assets/panels`: story panels (`p1..p48`)
