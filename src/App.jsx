@@ -28,9 +28,9 @@ const CHAPTERS = {
 const VALID_PATHS = ["/", CHAPTERS.chapter1.path, CHAPTERS.chapter2.path];
 
 const REVIEW_LINKS = [
-  { label: "Arjun", href: "https://en.wikipedia.org/wiki/T_cell" },
-  { label: "Dr. Immuno", href: "https://en.wikipedia.org/wiki/B_cell" },
-  { label: "Neutrophil", href: "https://en.wikipedia.org/wiki/Antibody" }
+  { label: "Neutrophil", href: "https://en.wikipedia.org/wiki/Neutrophil" },
+  { label: "T-Helper Cel", href: "https://en.wikipedia.org/wiki/T_helper_cell" },
+  { label: "Memory Cell", href: "https://en.wikipedia.org/wiki/Immunological_memory" }
 ];
 
 const CREDITS = {

@@ -1,22 +1,20 @@
 export const TERM_REFERENCES = {
   Arjun: {
     title: "Arjun",
-    wikiPage: "T_cell",
     fallback: "T cells identify infected or abnormal cells and coordinate adaptive immunity."
   },
   "Dr. Immuno": {
     title: "Dr. Immuno",
-    wikiPage: "B_cell",
     fallback: "B cells recognize antigens and can mature into antibody-producing plasma cells."
   },
   Neutrophil: {
     title: "Neutrophil",
-    wikiPage: "Antibody",
+    wikiPage: "Neutrophil",
     fallback: "Antibodies bind specific targets, neutralize pathogens, and tag them for clearance."
   },
   "T-Helper Cel": {
     title: "T-Helper Cel",
-    wikiPage: "Macrophage",
+    wikiPage: "T_helper_cell",
     fallback: "Macrophages engulf pathogens and present antigens to help activate adaptive responses."
   },
   Antigen: {
@@ -26,17 +24,17 @@ export const TERM_REFERENCES = {
   },
   "B-Cell": {
     title: "B-Cell",
-    wikiPage: "Dendritic_cell",
+    wikiPage: "B_cell",
     fallback: "Dendritic cells are powerful antigen-presenting cells that activate naive T cells."
   },
   "CD8 + Cypotoxic T-Cell": {
     title: "CD8 + Cypotoxic T-Cell",
-    wikiPage: "Immunological_memory",
+    wikiPage: "Cytotoxic_T_cell",
     fallback: "Memory cells preserve immune recognition for faster responses in future encounters."
   },
   "Memory Cell": {
     title: "Memory Cell",
-    wikiPage: "Neutrophil",
+    wikiPage: "Immunological_memory",
     fallback: "Neutrophils are rapid first responders in innate immunity."
   },
   PAMPs: {

@@ -28,14 +28,16 @@ export default function InfoOverlay({ info, anchor, onClose }) {
           <h3 className="mt-1 text-lg font-extrabold text-white">{info.title}</h3>
           <p className="mt-2 text-sm font-semibold leading-relaxed text-slate-100/95">{info.description}</p>
 
-          <a
-            href={info.link}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-3 inline-flex rounded-full border border-cyan-100/30 bg-cyan-200/15 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.1em] text-cyan-100 transition hover:scale-[1.03]"
-          >
-            Learn more
-          </a>
+          {info.link ? (
+            <a
+              href={info.link}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 inline-flex rounded-full border border-cyan-100/30 bg-cyan-200/15 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.1em] text-cyan-100 transition hover:scale-[1.03]"
+            >
+              Learn more
+            </a>
+          ) : null}
         </motion.div>
       ) : null}
     </AnimatePresence>

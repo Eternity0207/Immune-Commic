@@ -3,19 +3,19 @@ export const KNOWLEDGE_BASE = {
     title: "Arjun",
     description:
       "T cells recognize infected cells and coordinate targeted immune defense when danger signals appear.",
-    link: "https://en.wikipedia.org/wiki/T_cell",
+    link: "",
   },
   b_cell: {
     title: "Dr. Immuno",
     description:
       "B cells produce antibodies that bind pathogens and help the body clear them faster.",
-    link: "https://en.wikipedia.org/wiki/B_cell",
+    link: "",
   },
   antibody: {
     title: "Neutrophil",
     description:
       "Antibodies are proteins that lock onto specific foreign patterns and mark threats for elimination.",
-    link: "https://en.wikipedia.org/wiki/Antibody",
+    link: "https://en.wikipedia.org/wiki/Neutrophil",
   },
   antigen: {
     title: "Antigen",
@@ -27,13 +27,13 @@ export const KNOWLEDGE_BASE = {
     title: "T-Helper Cel",
     description:
       "Macrophages engulf pathogens and debris, then present clues that guide adaptive immunity.",
-    link: "https://en.wikipedia.org/wiki/Macrophage",
+    link: "https://en.wikipedia.org/wiki/T_helper_cell",
   },
   neutrophil: {
     title: "Memory Cell",
     description:
       "Neutrophils are rapid first responders that quickly arrive and attack invading microbes.",
-    link: "https://en.wikipedia.org/wiki/Neutrophil",
+    link: "https://en.wikipedia.org/wiki/Immunological_memory",
   },
   helper_t_cell: {
     title: "Helper T Cell",
@@ -51,7 +51,7 @@ export const KNOWLEDGE_BASE = {
     title: "CD8 + Cypotoxic T-Cell",
     description:
       "Memory cells store pathogen patterns so future responses become faster and stronger.",
-    link: "https://en.wikipedia.org/wiki/Immunological_memory",
+    link: "https://en.wikipedia.org/wiki/Cytotoxic_T_cell",
   },
   self_marker: {
     title: "Self Marker",

@@ -10,9 +10,11 @@ export default function CharacterSection({ characters }) {
             <div>
               <h4>{character.name}</h4>
               <p>{character.description}</p>
-              <a href={character.link} target="_blank" rel="noreferrer noopener">
-                Learn more
-              </a>
+              {character.link ? (
+                <a href={character.link} target="_blank" rel="noreferrer noopener">
+                  Learn more
+                </a>
+              ) : null}
             </div>
           </li>
         ))}

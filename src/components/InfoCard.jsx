@@ -25,14 +25,16 @@ export default function InfoCard({ info, onClose }) {
       <h2 className="mt-2 text-lg font-semibold leading-tight">{info.title}</h2>
       <p className="mt-2 leading-relaxed text-white/95">{info.desc}</p>
 
-      <a
-        href={info.link}
-        target="_blank"
-        rel="noreferrer"
-        className="mt-3 inline-block text-xs uppercase tracking-[0.16em] text-cyan-100 underline decoration-cyan-300/70 underline-offset-2"
-      >
-        Wikipedia
-      </a>
+      {info.link ? (
+        <a
+          href={info.link}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-3 inline-block text-xs uppercase tracking-[0.16em] text-cyan-100 underline decoration-cyan-300/70 underline-offset-2"
+        >
+          Wikipedia
+        </a>
+      ) : null}
     </motion.aside>
   );
 }

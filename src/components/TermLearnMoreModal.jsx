@@ -17,10 +17,23 @@ export default function TermLearnMoreModal({ termKey, onClose, onUiClick }) {
       return undefined;
     }
 
-    const wikiPage = reference?.wikiPage ?? termKey;
+    const hasExplicitNoWiki = Boolean(reference) && !reference?.wikiPage;
+    const wikiPage = hasExplicitNoWiki ? "" : reference?.wikiPage ?? termKey;
     const fallbackTitle = reference?.title ?? termKey;
     const fallbackSummary = reference?.fallback ?? "No additional summary is available for this term yet.";
-    const fallbackLink = `https://en.wikipedia.org/wiki/${encodeURIComponent(wikiPage)}`;
+    const fallbackLink = wikiPage ? `https://en.wikipedia.org/wiki/${encodeURIComponent(wikiPage)}` : "";
+
+    if (!wikiPage) {
+      setState({
+        loading: false,
+        summary: fallbackSummary,
+        title: fallbackTitle,
+        link: "",
+        source: "fallback"
+      });
+
+      return undefined;
+    }
 
     const controller = new AbortController();
 
@@ -95,9 +108,11 @@ export default function TermLearnMoreModal({ termKey, onClose, onUiClick }) {
             {state.loading ? "Fetching Wikipedia summary..." : state.source === "wikipedia" ? "Source: Wikipedia" : "Source: Built-in note"}
           </span>
 
-          <a href={state.link} target="_blank" rel="noreferrer noopener" className="learn-modal-link">
-            Read Full Article
-          </a>
+          {state.link ? (
+            <a href={state.link} target="_blank" rel="noreferrer noopener" className="learn-modal-link">
+              Read Full Article
+            </a>
+          ) : null}
         </div>
 
         <button

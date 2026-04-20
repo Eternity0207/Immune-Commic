@@ -412,7 +412,7 @@ export const CHARACTERS = [
     image: "/assets/characters/char1.png",
     description:
       "T cells verify antigen clues and direct the attack plan. Some helper T cells coordinate signals while cytotoxic T cells remove infected host cells.",
-    link: "https://en.wikipedia.org/wiki/T_cell"
+    link: ""
   },
   {
     id: "b-cell",
@@ -420,7 +420,7 @@ export const CHARACTERS = [
     image: "/assets/characters/char2.png",
     description:
       "B cells test receptors against antigens and clone when they find a match. They mature into plasma cells that release large numbers of antibodies.",
-    link: "https://en.wikipedia.org/wiki/B_cell"
+    link: ""
   },
   {
     id: "antibody",
@@ -428,7 +428,7 @@ export const CHARACTERS = [
     image: "/assets/characters/char3.png",
     description:
       "Antibodies are precision tags that bind specific threats. They block pathogen entry and help immune cells clear marked targets faster.",
-    link: "https://en.wikipedia.org/wiki/Antibody"
+    link: "https://en.wikipedia.org/wiki/Neutrophil"
   },
   {
     id: "macrophage",
@@ -436,7 +436,7 @@ export const CHARACTERS = [
     image: "/assets/characters/char4.png",
     description:
       "Macrophages engulf microbes and debris at infection sites. They also present antigen evidence that helps activate adaptive immune responses.",
-    link: "https://en.wikipedia.org/wiki/Macrophage"
+    link: "https://en.wikipedia.org/wiki/T_helper_cell"
   },
   {
     id: "antigen",
@@ -452,7 +452,7 @@ export const CHARACTERS = [
     image: "/assets/characters/char6.png",
     description:
       "Dendritic cells travel with antigen evidence from tissues to lymph nodes. They are expert messengers that connect early alarms to targeted immunity.",
-    link: "https://en.wikipedia.org/wiki/Dendritic_cell"
+    link: "https://en.wikipedia.org/wiki/B_cell"
   },
   {
     id: "memory-cell",
@@ -460,7 +460,7 @@ export const CHARACTERS = [
     image: "/assets/characters/char7.png",
     description:
       "Memory cells preserve successful recognition patterns from past infections. They help the body respond rapidly during future encounters.",
-    link: "https://en.wikipedia.org/wiki/Immunological_memory"
+    link: "https://en.wikipedia.org/wiki/Cytotoxic_T_cell"
   },
   {
     id: "neutrophil",
@@ -468,7 +468,7 @@ export const CHARACTERS = [
     image: "/assets/characters/char8.png",
     description:
       "Neutrophils are fast innate defenders that arrive early. They quickly trap and digest invaders while the rest of the immune system mobilizes.",
-    link: "https://en.wikipedia.org/wiki/Neutrophil"
+    link: "https://en.wikipedia.org/wiki/Immunological_memory"
   }
 ];
 
