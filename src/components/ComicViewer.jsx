@@ -11,7 +11,7 @@ const PANELS = [
     image: "/assets/panels/p1.png",
     caption: "Recognition begins with form.",
     hotspots: [
-      { id: "t1", key: "t_cell", label: "T Cell", x: 32, y: 54 },
+      { id: "t1", key: "t_cell", label: "Arjun", x: 32, y: 54 },
       { id: "a1", key: "antigen", label: "Antigen", x: 63, y: 42 },
       { id: "s1", key: "self_marker", label: "Self Marker", x: 49, y: 70 },
     ],
@@ -22,7 +22,7 @@ const PANELS = [
     caption: "Self and non-self are read like patterns.",
     hotspots: [
       { id: "n1", key: "non_self_pattern", label: "Non-Self Pattern", x: 58, y: 38 },
-      { id: "m1", key: "macrophage", label: "Macrophage", x: 34, y: 58 },
+      { id: "m1", key: "macrophage", label: "T-Helper Cel", x: 34, y: 58 },
     ],
   },
   {
@@ -31,8 +31,8 @@ const PANELS = [
     caption: "Defense shifts from detection to response.",
     hotspots: [
       { id: "h1", key: "helper_t_cell", label: "Helper T Cell", x: 43, y: 49 },
-      { id: "b1", key: "b_cell", label: "B Cell", x: 67, y: 58 },
-      { id: "ab1", key: "antibody", label: "Antibody", x: 74, y: 40 },
+      { id: "b1", key: "b_cell", label: "Dr. Immuno", x: 67, y: 58 },
+      { id: "ab1", key: "antibody", label: "Neutrophil", x: 74, y: 40 },
     ],
   },
   {
@@ -49,8 +49,8 @@ const PANELS = [
     image: "/assets/panels/p40.png",
     caption: "Memory keeps the next response faster.",
     hotspots: [
-      { id: "m2", key: "memory_cell", label: "Memory Cell", x: 52, y: 46 },
-      { id: "ab2", key: "antibody", label: "Antibody", x: 68, y: 57 },
+      { id: "m2", key: "memory_cell", label: "CD8 + Cypotoxic T-Cell", x: 52, y: 46 },
+      { id: "ab2", key: "antibody", label: "Neutrophil", x: 68, y: 57 },
     ],
   },
 ];

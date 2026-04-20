@@ -2,22 +2,22 @@ export const PANELS = [
   {
     number: 1,
     image: "/assets/characters/char1.png",
-    caption: "T Cell - identifies infected cells and coordinates targeted immune attacks."
+    caption: "Arjun - identifies infected cells and coordinates targeted immune attacks."
   },
   {
     number: 2,
     image: "/assets/characters/char2.png",
-    caption: "B Cell - recognizes antigen and differentiates into antibody-producing plasma cells."
+    caption: "Dr. Immuno - recognizes antigen and differentiates into antibody-producing plasma cells."
   },
   {
     number: 3,
     image: "/assets/characters/char3.png",
-    caption: "Antibody - binds specific pathogens to neutralize and tag them for clearance."
+    caption: "Neutrophil - binds specific pathogens to neutralize and tag them for clearance."
   },
   {
     number: 4,
     image: "/assets/characters/char4.png",
-    caption: "Macrophage - engulfs microbes and presents antigen fragments to T cells."
+    caption: "T-Helper Cel - engulfs microbes and presents antigen fragments to T cells."
   },
   {
     number: 5,
@@ -27,17 +27,17 @@ export const PANELS = [
   {
     number: 6,
     image: "/assets/characters/char6.png",
-    caption: "Dendritic Cell - carries antigen evidence to lymph nodes and activates naive T cells."
+    caption: "B-Cell - carries antigen evidence to lymph nodes and activates naive T cells."
   },
   {
     number: 7,
     image: "/assets/characters/char7.png",
-    caption: "Memory Cell - stores recognition patterns for a faster response on re-exposure."
+    caption: "CD8 + Cypotoxic T-Cell - stores recognition patterns for a faster response on re-exposure."
   },
   {
     number: 8,
     image: "/assets/characters/char8.png",
-    caption: "Neutrophil - rapid first responder that exits blood vessels to attack microbes."
+    caption: "Memory Cell - rapid first responder that exits blood vessels to attack microbes."
   },
   {
     number: 9,
@@ -87,7 +87,7 @@ export const PANELS = [
   {
     number: 18,
     image: "/assets/panels/p18.png",
-    caption: "Macrophage cleanup releases cytokines that amplify alarms and contribute to fever."
+    caption: "T-Helper Cel cleanup releases cytokines that amplify alarms and contribute to fever."
   },
   {
     number: 19,
@@ -242,23 +242,23 @@ export const PANELS = [
 ];
 
 export const PANEL_TERMS = {
-  1: ["T Cell"],
-  2: ["B Cell", "BCR"],
-  3: ["Antibody"],
-  4: ["Macrophage", "MHC-II"],
+  1: ["Arjun"],
+  2: ["Dr. Immuno", "BCR"],
+  3: ["Neutrophil"],
+  4: ["T-Helper Cel", "MHC-II"],
   5: ["Antigen"],
-  6: ["Dendritic Cell", "APC"],
-  7: ["Memory Cell", "Immune Memory"],
-  8: ["Neutrophil"],
+  6: ["B-Cell", "APC"],
+  7: ["CD8 + Cypotoxic T-Cell", "Immune Memory"],
+  8: ["Memory Cell"],
   9: ["PAMPs", "DAMPs"],
   10: ["PAMPs"],
   11: ["Cytokines"],
   12: ["DAMPs", "PAMPs", "TLR"],
-  13: ["Diapedesis", "Neutrophil"],
-  14: ["Neutrophil"],
-  15: ["Neutrophil"],
+  13: ["Diapedesis", "Memory Cell"],
+  14: ["Memory Cell"],
+  15: ["Memory Cell"],
   16: ["Phagocytosis", "ROS", "NETs"],
-  17: ["Macrophage", "Phagocytosis"],
+  17: ["T-Helper Cel", "Phagocytosis"],
   18: ["Cytokines"],
   19: ["Inflammation"],
   20: ["MHC-II", "Antigen Presentation", "APC"],
@@ -281,7 +281,7 @@ export const PANEL_TERMS = {
   37: ["Th1", "Th2", "Th17", "Treg"],
   38: ["IL-4", "IL-21"],
   39: ["BCR", "Plasma Cell"],
-  40: ["Antibody", "Complement", "Opsonization"],
+  40: ["Neutrophil", "Complement", "Opsonization"],
   41: ["Hypermutation", "Affinity Maturation", "Class Switching"],
   42: ["IL-2", "CD8"],
   43: ["CD8", "MHC-I", "Apoptosis"],
@@ -408,7 +408,7 @@ export const MID_STORY_QUESTIONS = [
 export const CHARACTERS = [
   {
     id: "t-cell",
-    name: "T Cell",
+    name: "Arjun",
     image: "/assets/characters/char1.png",
     description:
       "T cells verify antigen clues and direct the attack plan. Some helper T cells coordinate signals while cytotoxic T cells remove infected host cells.",
@@ -416,7 +416,7 @@ export const CHARACTERS = [
   },
   {
     id: "b-cell",
-    name: "B Cell",
+    name: "Dr. Immuno",
     image: "/assets/characters/char2.png",
     description:
       "B cells test receptors against antigens and clone when they find a match. They mature into plasma cells that release large numbers of antibodies.",
@@ -424,7 +424,7 @@ export const CHARACTERS = [
   },
   {
     id: "antibody",
-    name: "Antibody",
+    name: "Neutrophil",
     image: "/assets/characters/char3.png",
     description:
       "Antibodies are precision tags that bind specific threats. They block pathogen entry and help immune cells clear marked targets faster.",
@@ -432,7 +432,7 @@ export const CHARACTERS = [
   },
   {
     id: "macrophage",
-    name: "Macrophage",
+    name: "T-Helper Cel",
     image: "/assets/characters/char4.png",
     description:
       "Macrophages engulf microbes and debris at infection sites. They also present antigen evidence that helps activate adaptive immune responses.",
@@ -448,7 +448,7 @@ export const CHARACTERS = [
   },
   {
     id: "dendritic-cell",
-    name: "Dendritic Cell",
+    name: "B-Cell",
     image: "/assets/characters/char6.png",
     description:
       "Dendritic cells travel with antigen evidence from tissues to lymph nodes. They are expert messengers that connect early alarms to targeted immunity.",
@@ -456,7 +456,7 @@ export const CHARACTERS = [
   },
   {
     id: "memory-cell",
-    name: "Memory Cell",
+    name: "CD8 + Cypotoxic T-Cell",
     image: "/assets/characters/char7.png",
     description:
       "Memory cells preserve successful recognition patterns from past infections. They help the body respond rapidly during future encounters.",
@@ -464,7 +464,7 @@ export const CHARACTERS = [
   },
   {
     id: "neutrophil",
-    name: "Neutrophil",
+    name: "Memory Cell",
     image: "/assets/characters/char8.png",
     description:
       "Neutrophils are fast innate defenders that arrive early. They quickly trap and digest invaders while the rest of the immune system mobilizes.",

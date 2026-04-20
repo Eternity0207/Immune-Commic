@@ -1,21 +1,21 @@
 export const TERM_REFERENCES = {
-  "T Cell": {
-    title: "T Cell",
+  Arjun: {
+    title: "Arjun",
     wikiPage: "T_cell",
     fallback: "T cells identify infected or abnormal cells and coordinate adaptive immunity."
   },
-  "B Cell": {
-    title: "B Cell",
+  "Dr. Immuno": {
+    title: "Dr. Immuno",
     wikiPage: "B_cell",
     fallback: "B cells recognize antigens and can mature into antibody-producing plasma cells."
   },
-  Antibody: {
-    title: "Antibody",
+  Neutrophil: {
+    title: "Neutrophil",
     wikiPage: "Antibody",
     fallback: "Antibodies bind specific targets, neutralize pathogens, and tag them for clearance."
   },
-  Macrophage: {
-    title: "Macrophage",
+  "T-Helper Cel": {
+    title: "T-Helper Cel",
     wikiPage: "Macrophage",
     fallback: "Macrophages engulf pathogens and present antigens to help activate adaptive responses."
   },
@@ -24,18 +24,18 @@ export const TERM_REFERENCES = {
     wikiPage: "Antigen",
     fallback: "An antigen is a molecular pattern immune receptors can recognize."
   },
-  "Dendritic Cell": {
-    title: "Dendritic Cell",
+  "B-Cell": {
+    title: "B-Cell",
     wikiPage: "Dendritic_cell",
     fallback: "Dendritic cells are powerful antigen-presenting cells that activate naive T cells."
   },
-  "Memory Cell": {
-    title: "Memory Cell",
+  "CD8 + Cypotoxic T-Cell": {
+    title: "CD8 + Cypotoxic T-Cell",
     wikiPage: "Immunological_memory",
     fallback: "Memory cells preserve immune recognition for faster responses in future encounters."
   },
-  Neutrophil: {
-    title: "Neutrophil",
+  "Memory Cell": {
+    title: "Memory Cell",
     wikiPage: "Neutrophil",
     fallback: "Neutrophils are rapid first responders in innate immunity."
   },
