@@ -6,7 +6,13 @@ import QuestionBlock from "./components/QuestionBlock";
 import Sidebar from "./components/Sidebar";
 import TermLearnMoreModal from "./components/TermLearnMoreModal";
 import useUiAudio from "./hooks/useUiAudio";
-import { CHARACTERS, FINAL_QUIZ, MID_STORY_QUESTIONS, PANELS, PANEL_TERMS } from "./lib/storyData";
+import {
+  CHARACTERS,
+  FINAL_QUIZ,
+  MID_STORY_QUESTIONS,
+  PANELS,
+  PANEL_TERMS,
+} from "./lib/storyData";
 
 const CHAPTERS = {
   chapter1: {
@@ -14,30 +20,37 @@ const CHAPTERS = {
     path: "/chapter-1",
     title: "Chapter 1: The First Alarm",
     startPanel: 9,
-    endPanel: 29
+    endPanel: 29,
   },
   chapter2: {
     key: "chapter2",
     path: "/chapter-2",
     title: "Chapter 2: The Adaptive Arm Awakens",
     startPanel: 30,
-    endPanel: 48
-  }
+    endPanel: 48,
+  },
 };
 
 const VALID_PATHS = ["/", CHAPTERS.chapter1.path, CHAPTERS.chapter2.path];
 
 const REVIEW_LINKS = [
   { label: "Neutrophil", href: "https://en.wikipedia.org/wiki/Neutrophil" },
-  { label: "T-Helper Cel", href: "https://en.wikipedia.org/wiki/T_helper_cell" },
-  { label: "Memory Cell", href: "https://en.wikipedia.org/wiki/Immunological_memory" }
+  {
+    label: "T-Helper Cel",
+    href: "https://en.wikipedia.org/wiki/T_helper_cell",
+  },
+  {
+    label: "Memory Cell",
+    href: "https://en.wikipedia.org/wiki/Immunological_memory",
+  },
 ];
 
 const CREDITS = {
   projectTitle: "Immune System Comic",
-  institution: "Developed at IIT Jodhpur (Indian Institute of Technology Jodhpur)",
+  institution:
+    "Developed at IIT Jodhpur (Indian Institute of Technology Jodhpur)",
   professors: ["Dr. Sunil Lohar"],
-  teamMembers: ["Arsh Goyal", "Gyan Vardhan Chauhan"]
+  teamMembers: ["Arsh Goyal", "Gyan Vardhan Chauhan"],
 };
 
 function normalizePath(pathname) {
@@ -89,7 +102,9 @@ function getScoreBadge(score, maxScore) {
 
 export default function App() {
   const [currentPath, setCurrentPath] = useState(() =>
-    typeof window === "undefined" ? "/" : normalizePath(window.location.pathname)
+    typeof window === "undefined"
+      ? "/"
+      : normalizePath(window.location.pathname),
   );
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCreditsOpen, setIsCreditsOpen] = useState(false);
@@ -97,8 +112,14 @@ export default function App() {
   const [playingPanelNumber, setPlayingPanelNumber] = useState(null);
   const [quizOpenRequest, setQuizOpenRequest] = useState(0);
   const [hasEnteredStory, setHasEnteredStory] = useState(false);
-  const [chapterScores, setChapterScores] = useState({ chapter1: {}, chapter2: {} });
-  const [chapterResetKeys, setChapterResetKeys] = useState({ chapter1: 0, chapter2: 0 });
+  const [chapterScores, setChapterScores] = useState({
+    chapter1: {},
+    chapter2: {},
+  });
+  const [chapterResetKeys, setChapterResetKeys] = useState({
+    chapter1: 0,
+    chapter2: 0,
+  });
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showScrollHint, setShowScrollHint] = useState(true);
 
@@ -106,28 +127,48 @@ export default function App() {
   const preferredVoiceRef = useRef(null);
   const ttsPrimedRef = useRef(false);
   const fallbackNarrationRef = useRef(null);
+  const backgroundMusicRef = useRef(null);
   const { playSfx } = useUiAudio();
+
+  const ensureAmbientPlayback = useCallback(() => {
+    const track = backgroundMusicRef.current;
+
+    if (!track || !track.paused) {
+      return;
+    }
+
+    const playPromise = track.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {
+        // Playback may still be blocked until browser allows it.
+      });
+    }
+  }, []);
 
   const chapter1Panels = useMemo(
     () =>
       PANELS.filter(
-        (panel) => panel.number >= CHAPTERS.chapter1.startPanel && panel.number <= CHAPTERS.chapter1.endPanel
+        (panel) =>
+          panel.number >= CHAPTERS.chapter1.startPanel &&
+          panel.number <= CHAPTERS.chapter1.endPanel,
       ).map((panel) => ({
         ...panel,
-        terms: PANEL_TERMS[panel.number] ?? []
+        terms: PANEL_TERMS[panel.number] ?? [],
       })),
-    []
+    [],
   );
 
   const chapter2Panels = useMemo(
     () =>
       PANELS.filter(
-        (panel) => panel.number >= CHAPTERS.chapter2.startPanel && panel.number <= CHAPTERS.chapter2.endPanel
+        (panel) =>
+          panel.number >= CHAPTERS.chapter2.startPanel &&
+          panel.number <= CHAPTERS.chapter2.endPanel,
       ).map((panel) => ({
         ...panel,
-        terms: PANEL_TERMS[panel.number] ?? []
+        terms: PANEL_TERMS[panel.number] ?? [],
       })),
-    []
+    [],
   );
 
   const chapter1Questions = useMemo(
@@ -135,9 +176,9 @@ export default function App() {
       MID_STORY_QUESTIONS.filter(
         (question) =>
           question.insertAfter >= CHAPTERS.chapter1.startPanel &&
-          question.insertAfter <= CHAPTERS.chapter1.endPanel
+          question.insertAfter <= CHAPTERS.chapter1.endPanel,
       ),
-    []
+    [],
   );
 
   const chapter2Questions = useMemo(
@@ -145,13 +186,19 @@ export default function App() {
       MID_STORY_QUESTIONS.filter(
         (question) =>
           question.insertAfter >= CHAPTERS.chapter2.startPanel &&
-          question.insertAfter <= CHAPTERS.chapter2.endPanel
+          question.insertAfter <= CHAPTERS.chapter2.endPanel,
       ),
-    []
+    [],
   );
 
-  const chapter1QuestionByPanel = useMemo(() => mapQuestionsByPanel(chapter1Questions), [chapter1Questions]);
-  const chapter2QuestionByPanel = useMemo(() => mapQuestionsByPanel(chapter2Questions), [chapter2Questions]);
+  const chapter1QuestionByPanel = useMemo(
+    () => mapQuestionsByPanel(chapter1Questions),
+    [chapter1Questions],
+  );
+  const chapter2QuestionByPanel = useMemo(
+    () => mapQuestionsByPanel(chapter2Questions),
+    [chapter2Questions],
+  );
 
   const totalQuestionsChapter1 = chapter1Questions.length;
   const totalQuestionsChapter2 = chapter2Questions.length;
@@ -159,12 +206,20 @@ export default function App() {
   const chapter2TotalMarks = totalQuestionsChapter2 * 10;
 
   const chapter1Score = useMemo(
-    () => Object.values(chapterScores.chapter1).reduce((sum, value) => sum + value, 0),
-    [chapterScores.chapter1]
+    () =>
+      Object.values(chapterScores.chapter1).reduce(
+        (sum, value) => sum + value,
+        0,
+      ),
+    [chapterScores.chapter1],
   );
   const chapter2Score = useMemo(
-    () => Object.values(chapterScores.chapter2).reduce((sum, value) => sum + value, 0),
-    [chapterScores.chapter2]
+    () =>
+      Object.values(chapterScores.chapter2).reduce(
+        (sum, value) => sum + value,
+        0,
+      ),
+    [chapterScores.chapter2],
   );
 
   const chapter1Percent = getScorePercent(chapter1Score, chapter1TotalMarks);
@@ -199,25 +254,40 @@ export default function App() {
     return [];
   }, [activeChapterKey, chapter1Panels, chapter2Panels]);
 
-  const activeQuestionByPanel = activeChapterKey === "chapter1" ? chapter1QuestionByPanel : chapter2QuestionByPanel;
+  const activeQuestionByPanel =
+    activeChapterKey === "chapter1"
+      ? chapter1QuestionByPanel
+      : chapter2QuestionByPanel;
   const activeFinalPanelNumber = activePanels[activePanels.length - 1]?.number;
-  const activeChapterResetKey = activeChapterKey ? chapterResetKeys[activeChapterKey] : 0;
+  const activeChapterResetKey = activeChapterKey
+    ? chapterResetKeys[activeChapterKey]
+    : 0;
 
-  const activeChapterScore = activeChapterKey === "chapter1" ? chapter1Score : chapter2Score;
-  const activeChapterTotalMarks = activeChapterKey === "chapter1" ? chapter1TotalMarks : chapter2TotalMarks;
-  const activeChapterScoreMessage = getScoreMessage(activeChapterScore, activeChapterTotalMarks);
-  const activeChapterScoreBadge = getScoreBadge(activeChapterScore, activeChapterTotalMarks);
+  const activeChapterScore =
+    activeChapterKey === "chapter1" ? chapter1Score : chapter2Score;
+  const activeChapterTotalMarks =
+    activeChapterKey === "chapter1" ? chapter1TotalMarks : chapter2TotalMarks;
+  const activeChapterScoreMessage = getScoreMessage(
+    activeChapterScore,
+    activeChapterTotalMarks,
+  );
+  const activeChapterScoreBadge = getScoreBadge(
+    activeChapterScore,
+    activeChapterTotalMarks,
+  );
 
-  const sidebarResetSignal = chapterResetKeys.chapter1 + chapterResetKeys.chapter2;
+  const sidebarResetSignal =
+    chapterResetKeys.chapter1 + chapterResetKeys.chapter2;
 
   const navigateTo = useCallback((nextPath, { replace = false } = {}) => {
     const normalizedPath = normalizePath(nextPath);
+    const browserPath = "/";
 
     if (typeof window !== "undefined") {
       if (replace) {
-        window.history.replaceState({}, "", normalizedPath);
-      } else if (window.location.pathname !== normalizedPath) {
-        window.history.pushState({}, "", normalizedPath);
+        window.history.replaceState({}, "", browserPath);
+      } else if (window.location.pathname !== browserPath) {
+        window.history.pushState({}, "", browserPath);
       }
 
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -257,7 +327,10 @@ export default function App() {
 
       stopFallbackNarration();
 
-      const apiBase = (import.meta.env.VITE_TTS_API_BASE_URL || "").replace(/\/$/, "");
+      const apiBase = (import.meta.env.VITE_TTS_API_BASE_URL || "").replace(
+        /\/$/,
+        "",
+      );
       const url = `${apiBase}/api/tts?lang=en&text=${encodeURIComponent(caption)}`;
       const audio = new Audio(url);
       audio.volume = 1;
@@ -268,7 +341,9 @@ export default function App() {
           return;
         }
 
-        setPlayingPanelNumber((value) => (value === panelNumber ? null : value));
+        setPlayingPanelNumber((value) =>
+          value === panelNumber ? null : value,
+        );
       };
 
       audio.onplay = () => {
@@ -291,7 +366,7 @@ export default function App() {
         clearPlayingState();
       }
     },
-    [stopFallbackNarration]
+    [stopFallbackNarration],
   );
 
   const pickPreferredVoice = useCallback(() => {
@@ -305,7 +380,11 @@ export default function App() {
     }
 
     preferredVoiceRef.current =
-      voices.find((voice) => /en-|en_|english|india|indian|hindi/i.test(`${voice.lang} ${voice.name}`)) || voices[0];
+      voices.find((voice) =>
+        /en-|en_|english|india|indian|hindi/i.test(
+          `${voice.lang} ${voice.name}`,
+        ),
+      ) || voices[0];
   }, []);
 
   const speakPanelCaption = useCallback(
@@ -338,7 +417,11 @@ export default function App() {
       let hasFallenBack = false;
 
       const runFallback = () => {
-        if (hasStarted || hasFallenBack || narrationTokenRef.current !== narrationToken) {
+        if (
+          hasStarted ||
+          hasFallenBack ||
+          narrationTokenRef.current !== narrationToken
+        ) {
           return;
         }
 
@@ -371,7 +454,9 @@ export default function App() {
           return;
         }
 
-        setPlayingPanelNumber((value) => (value === panel.number ? null : value));
+        setPlayingPanelNumber((value) =>
+          value === panel.number ? null : value,
+        );
       };
 
       utterance.onerror = () => {
@@ -388,19 +473,26 @@ export default function App() {
         }
       }, 900);
     },
-    [pickPreferredVoice, playFallbackNarration, playSfx, stopFallbackNarration]
+    [pickPreferredVoice, playFallbackNarration, playSfx, stopFallbackNarration],
   );
 
   const playTap = useCallback(() => {
     playSfx("tap", { volume: 0.35 });
-  }, [playSfx]);
+    ensureAmbientPlayback();
+  }, [ensureAmbientPlayback, playSfx]);
 
   const handlePathChange = useCallback(() => {
     if (typeof window === "undefined") {
       return;
     }
 
-    setCurrentPath(normalizePath(window.location.pathname));
+    if (window.location.pathname !== "/") {
+      window.history.replaceState({}, "", "/");
+    }
+
+    setCurrentPath("/");
+    setScrollProgress(0);
+    setShowScrollHint(true);
   }, []);
 
   const handleContinueToChapter2 = useCallback(() => {
@@ -423,7 +515,7 @@ export default function App() {
     (panel) => {
       speakPanelCaption(panel, { cueVolume: 1 });
     },
-    [speakPanelCaption]
+    [speakPanelCaption],
   );
 
   const handlePauseNarration = useCallback(() => {
@@ -440,7 +532,9 @@ export default function App() {
       setChapterScores((previous) => {
         const currentChapterScores = previous[chapterKey] ?? {};
 
-        if (Object.prototype.hasOwnProperty.call(currentChapterScores, questionId)) {
+        if (
+          Object.prototype.hasOwnProperty.call(currentChapterScores, questionId)
+        ) {
           return previous;
         }
 
@@ -448,21 +542,21 @@ export default function App() {
           ...previous,
           [chapterKey]: {
             ...currentChapterScores,
-            [questionId]: isCorrect ? 10 : 0
-          }
+            [questionId]: isCorrect ? 10 : 0,
+          },
         };
       });
 
       playSfx(isCorrect ? "win" : "error", { volume: 0.42 });
     },
-    [playSfx]
+    [playSfx],
   );
 
   const handleQuizAnswer = useCallback(
     (isCorrect) => {
       playSfx(isCorrect ? "win" : "error", { volume: 0.4 });
     },
-    [playSfx]
+    [playSfx],
   );
 
   const handleOpenTerm = useCallback(
@@ -470,7 +564,7 @@ export default function App() {
       playSfx("attack", { volume: 0.32, playbackRate: 1.08 });
       setActiveTermKey(termKey);
     },
-    [playSfx]
+    [playSfx],
   );
 
   const handleOpenFinalQuiz = useCallback(() => {
@@ -483,42 +577,138 @@ export default function App() {
     setQuizOpenRequest((value) => value + 1);
   }, [isFinalQuizUnlocked, playSfx]);
 
-  const handleRetryChapter = useCallback((chapterKey) => {
-    playSfx("tap", { volume: 0.32 });
-    stopNarration();
+  const handleRetryChapter = useCallback(
+    (chapterKey) => {
+      playSfx("tap", { volume: 0.32 });
+      stopNarration();
 
-    setChapterScores((previous) => {
-      const next = {
-        ...previous,
-        [chapterKey]: {}
-      };
+      setChapterScores((previous) => {
+        const next = {
+          ...previous,
+          [chapterKey]: {},
+        };
 
-      if (chapterKey === "chapter1") {
-        next.chapter2 = {};
+        if (chapterKey === "chapter1") {
+          next.chapter2 = {};
+        }
+
+        return next;
+      });
+
+      setChapterResetKeys((previous) => {
+        const next = {
+          ...previous,
+          [chapterKey]: previous[chapterKey] + 1,
+        };
+
+        if (chapterKey === "chapter1") {
+          next.chapter2 = previous.chapter2 + 1;
+        }
+
+        return next;
+      });
+
+      setQuizOpenRequest(0);
+      setIsSidebarOpen(false);
+      setIsCreditsOpen(false);
+      setActiveTermKey("");
+      navigateTo(
+        chapterKey === "chapter1"
+          ? CHAPTERS.chapter1.path
+          : CHAPTERS.chapter2.path,
+      );
+    },
+    [navigateTo, playSfx, stopNarration],
+  );
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    if (window.location.pathname !== "/") {
+      window.history.replaceState({}, "", "/");
+      setCurrentPath("/");
+    }
+
+    return undefined;
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const ambientSources = ["/sounds/piano.mp3", "/sounds/ambient.wav"];
+    let sourceIndex = 0;
+
+    const ambientTrack = new Audio(ambientSources[sourceIndex]);
+    ambientTrack.loop = true;
+    ambientTrack.volume = 0.5;
+    ambientTrack.preload = "auto";
+    ambientTrack.playsInline = true;
+    backgroundMusicRef.current = ambientTrack;
+
+    const tryPlayAmbient = () => {
+      const activeTrack = backgroundMusicRef.current;
+
+      if (!activeTrack) {
+        return;
       }
 
-      return next;
-    });
+      const playPromise = activeTrack.play();
+      if (playPromise && typeof playPromise.catch === "function") {
+        playPromise.catch(() => {
+          // Browsers may block autoplay until first user interaction.
+        });
+      }
+    };
 
-    setChapterResetKeys((previous) => {
-      const next = {
-        ...previous,
-        [chapterKey]: previous[chapterKey] + 1
-      };
+    const unlockAmbient = () => {
+      tryPlayAmbient();
+    };
 
-      if (chapterKey === "chapter1") {
-        next.chapter2 = previous.chapter2 + 1;
+    const advanceAmbientSource = () => {
+      sourceIndex += 1;
+
+      if (sourceIndex >= ambientSources.length) {
+        return;
       }
 
-      return next;
-    });
+      ambientTrack.src = ambientSources[sourceIndex];
+      ambientTrack.load();
+      tryPlayAmbient();
+    };
 
-    setQuizOpenRequest(0);
-    setIsSidebarOpen(false);
-    setIsCreditsOpen(false);
-    setActiveTermKey("");
-    navigateTo(chapterKey === "chapter1" ? CHAPTERS.chapter1.path : CHAPTERS.chapter2.path);
-  }, [navigateTo, playSfx, stopNarration]);
+    ambientTrack.addEventListener("canplaythrough", tryPlayAmbient);
+    ambientTrack.addEventListener("error", advanceAmbientSource);
+    ambientTrack.load();
+    tryPlayAmbient();
+
+    window.addEventListener("pointerdown", unlockAmbient, { passive: true });
+    window.addEventListener("click", unlockAmbient, { passive: true });
+    window.addEventListener("touchstart", unlockAmbient, { passive: true });
+    window.addEventListener("keydown", unlockAmbient);
+    window.addEventListener("focus", unlockAmbient);
+    document.addEventListener("visibilitychange", unlockAmbient);
+
+    return () => {
+      window.removeEventListener("pointerdown", unlockAmbient);
+      window.removeEventListener("click", unlockAmbient);
+      window.removeEventListener("touchstart", unlockAmbient);
+      window.removeEventListener("keydown", unlockAmbient);
+      window.removeEventListener("focus", unlockAmbient);
+      document.removeEventListener("visibilitychange", unlockAmbient);
+      ambientTrack.removeEventListener("canplaythrough", tryPlayAmbient);
+      ambientTrack.removeEventListener("error", advanceAmbientSource);
+
+      if (backgroundMusicRef.current) {
+        backgroundMusicRef.current.pause();
+        backgroundMusicRef.current.src = "";
+        backgroundMusicRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -548,7 +738,10 @@ export default function App() {
     const updateScrollMeta = () => {
       const page = document.documentElement;
       const maxScrollable = Math.max(page.scrollHeight - window.innerHeight, 1);
-      const progress = Math.min(100, Math.max(0, (window.scrollY / maxScrollable) * 100));
+      const progress = Math.min(
+        100,
+        Math.max(0, (window.scrollY / maxScrollable) * 100),
+      );
 
       setScrollProgress(progress);
 
@@ -568,7 +761,11 @@ export default function App() {
   }, [activeChapterKey, activeChapterResetKey, hasEnteredStory]);
 
   useEffect(() => {
-    if (!activeChapterKey || typeof window === "undefined" || !("speechSynthesis" in window)) {
+    if (
+      !activeChapterKey ||
+      typeof window === "undefined" ||
+      !("speechSynthesis" in window)
+    ) {
       return undefined;
     }
 
@@ -578,12 +775,23 @@ export default function App() {
       pickPreferredVoice();
     };
 
-    window.speechSynthesis.addEventListener("voiceschanged", handleVoicesChanged);
-    return () => window.speechSynthesis.removeEventListener("voiceschanged", handleVoicesChanged);
+    window.speechSynthesis.addEventListener(
+      "voiceschanged",
+      handleVoicesChanged,
+    );
+    return () =>
+      window.speechSynthesis.removeEventListener(
+        "voiceschanged",
+        handleVoicesChanged,
+      );
   }, [activeChapterKey, pickPreferredVoice]);
 
   useEffect(() => {
-    if (!activeChapterKey || typeof window === "undefined" || !("speechSynthesis" in window)) {
+    if (
+      !activeChapterKey ||
+      typeof window === "undefined" ||
+      !("speechSynthesis" in window)
+    ) {
       return undefined;
     }
 
@@ -657,16 +865,26 @@ export default function App() {
           {chapter1Passed ? (
             <p className="comic-end-message">{activeChapterScoreMessage}</p>
           ) : (
-            <p className="chapter-gate-warning">You need at least 50% to proceed</p>
+            <p className="chapter-gate-warning">
+              You need at least 50% to proceed
+            </p>
           )}
 
           <div className="comic-end-actions">
             {chapter1Passed ? (
-              <button type="button" className="comic-end-btn" onClick={handleContinueToChapter2}>
+              <button
+                type="button"
+                className="comic-end-btn"
+                onClick={handleContinueToChapter2}
+              >
                 Continue to Chapter 2
               </button>
             ) : (
-              <button type="button" className="comic-end-btn is-secondary" onClick={() => handleRetryChapter("chapter1")}>
+              <button
+                type="button"
+                className="comic-end-btn is-secondary"
+                onClick={() => handleRetryChapter("chapter1")}
+              >
                 Retry Chapter 1
               </button>
             )}
@@ -689,23 +907,36 @@ export default function App() {
         {chapter2Passed ? (
           <p className="comic-end-message">{activeChapterScoreMessage}</p>
         ) : (
-          <p className="chapter-gate-warning">You need at least 50% to proceed</p>
+          <p className="chapter-gate-warning">
+            You need at least 50% to proceed
+          </p>
         )}
 
         <div className="comic-end-actions">
-          <button type="button" className="comic-end-btn" onClick={handleOpenFinalQuiz} disabled={!canTakeFinalQuiz}>
+          <button
+            type="button"
+            className="comic-end-btn"
+            onClick={handleOpenFinalQuiz}
+            disabled={!canTakeFinalQuiz}
+          >
             Take Final Quiz
           </button>
 
           {!chapter2Passed ? (
-            <button type="button" className="comic-end-btn is-secondary" onClick={() => handleRetryChapter("chapter2")}>
+            <button
+              type="button"
+              className="comic-end-btn is-secondary"
+              onClick={() => handleRetryChapter("chapter2")}
+            >
               Retry Chapter 2
             </button>
           ) : null}
         </div>
 
         {!canTakeFinalQuiz ? (
-          <p className="chapter-quiz-lock-note">Complete both chapters with at least 50% to unlock quiz</p>
+          <p className="chapter-quiz-lock-note">
+            Complete both chapters with at least 50% to unlock quiz
+          </p>
         ) : null}
 
         {!chapter2Passed ? renderReviewLinks() : null}
@@ -715,7 +946,7 @@ export default function App() {
 
   if (!hasEnteredStory || currentPath === "/") {
     return (
-      <div className="comic-app">
+      <div className="comic-app comic-app-intro">
         <button
           type="button"
           className="floating-credits-btn"
@@ -727,9 +958,16 @@ export default function App() {
           Credits
         </button>
 
-        <CreditsModal isOpen={isCreditsOpen} onClose={() => setIsCreditsOpen(false)} onUiClick={playTap} />
+        <CreditsModal
+          isOpen={isCreditsOpen}
+          onClose={() => setIsCreditsOpen(false)}
+          onUiClick={playTap}
+        />
 
-        <CharacterIntroPage characters={CHARACTERS} onContinue={handleContinueToStory} />
+        <CharacterIntroPage
+          characters={CHARACTERS}
+          onContinue={handleContinueToStory}
+        />
       </div>
     );
   }
@@ -747,19 +985,30 @@ export default function App() {
         Credits
       </button>
 
-      <CreditsModal isOpen={isCreditsOpen} onClose={() => setIsCreditsOpen(false)} onUiClick={playTap} />
+      <CreditsModal
+        isOpen={isCreditsOpen}
+        onClose={() => setIsCreditsOpen(false)}
+        onUiClick={playTap}
+      />
 
       <div className="comic-progress-track" aria-hidden="true">
-        <div className="comic-progress-fill" style={{ width: `${scrollProgress}%` }} />
+        <div
+          className="comic-progress-fill"
+          style={{ width: `${scrollProgress}%` }}
+        />
       </div>
 
       <p className="score-chip" aria-live="polite">
         Score: {activeChapterScore}
       </p>
 
-      {activeChapterScoreBadge ? <p className="score-badge">{activeChapterScoreBadge}</p> : null}
+      {activeChapterScoreBadge ? (
+        <p className="score-badge">{activeChapterScoreBadge}</p>
+      ) : null}
 
-      {showScrollHint ? <p className="comic-scroll-hint">Scroll to explore this chapter</p> : null}
+      {showScrollHint ? (
+        <p className="comic-scroll-hint">Scroll to explore this chapter</p>
+      ) : null}
 
       <button
         type="button"
@@ -789,14 +1038,20 @@ export default function App() {
         onOpenCredits={() => setIsCreditsOpen(true)}
       />
 
-      <TermLearnMoreModal termKey={activeTermKey} onClose={() => setActiveTermKey("")} onUiClick={playTap} />
+      <TermLearnMoreModal
+        termKey={activeTermKey}
+        onClose={() => setActiveTermKey("")}
+        onUiClick={playTap}
+      />
 
       <header className="comic-header-banner">
         <h1>Immune System Comic</h1>
       </header>
 
       <section className="chapter-title-banner" aria-label="Current chapter">
-        <p className="chapter-title-kicker">{activeChapter?.key === "chapter1" ? "Chapter 1" : "Chapter 2"}</p>
+        <p className="chapter-title-kicker">
+          {activeChapter?.key === "chapter1" ? "Chapter 1" : "Chapter 2"}
+        </p>
         <h2>{activeChapter?.title}</h2>
       </section>
 
@@ -805,12 +1060,17 @@ export default function App() {
         <ul>
           <li>Scroll frame-by-frame through the comic panels.</li>
           <li>Each checkpoint question is worth 10 points.</li>
-          <li>You need at least 50% in each chapter to unlock the next stage.</li>
+          <li>
+            You need at least 50% in each chapter to unlock the next stage.
+          </li>
           <li>Open the sidebar anytime for quiz and character references.</li>
         </ul>
       </section>
 
-      <main key={`story-${activeChapterKey}-${activeChapterResetKey}`} className="comic-feed">
+      <main
+        key={`story-${activeChapterKey}-${activeChapterResetKey}`}
+        className="comic-feed"
+      >
         {activePanels.map((panel) => (
           <section key={panel.number} className="comic-segment">
             <Panel
@@ -824,11 +1084,18 @@ export default function App() {
             {activeQuestionByPanel[panel.number] ? (
               <QuestionBlock
                 question={activeQuestionByPanel[panel.number]}
-                onAnswerSelect={(payload) => handleQuestionAnswer({ ...payload, chapterKey: activeChapterKey })}
+                onAnswerSelect={(payload) =>
+                  handleQuestionAnswer({
+                    ...payload,
+                    chapterKey: activeChapterKey,
+                  })
+                }
               />
             ) : null}
 
-            {panel.number === activeFinalPanelNumber ? renderChapterEndSummary() : null}
+            {panel.number === activeFinalPanelNumber
+              ? renderChapterEndSummary()
+              : null}
           </section>
         ))}
       </main>

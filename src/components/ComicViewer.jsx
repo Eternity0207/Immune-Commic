@@ -8,7 +8,7 @@ import TooltipSystem from "./TooltipSystem";
 const PANELS = [
   {
     id: "p1",
-    image: "/assets/panels/p1.png",
+    image: "/assets/panels/p1.jpeg",
     caption: "Recognition begins with form.",
     hotspots: [
       { id: "t1", key: "t_cell", label: "Arjun", x: 32, y: 54 },
@@ -18,16 +18,16 @@ const PANELS = [
   },
   {
     id: "p2",
-    image: "/assets/panels/p2.png",
+    image: "/assets/panels/p2.jpeg",
     caption: "Self and non-self are read like patterns.",
     hotspots: [
       { id: "n1", key: "non_self_pattern", label: "Non-Self Pattern", x: 58, y: 38 },
-      { id: "m1", key: "macrophage", label: "T-Helper Cel", x: 34, y: 58 },
+      { id: "m1", key: "macrophage", label: "T-Helper Cell", x: 34, y: 58 },
     ],
   },
   {
     id: "p10",
-    image: "/assets/panels/p10.png",
+    image: "/assets/panels/p10.jpeg",
     caption: "Defense shifts from detection to response.",
     hotspots: [
       { id: "h1", key: "helper_t_cell", label: "Helper T Cell", x: 43, y: 49 },
@@ -37,7 +37,7 @@ const PANELS = [
   },
   {
     id: "p14",
-    image: "/assets/panels/p14.png",
+    image: "/assets/panels/p14.jpeg",
     caption: "Precise targeting protects healthy tissue.",
     hotspots: [
       { id: "c1", key: "cytotoxic_t_cell", label: "Cytotoxic T Cell", x: 37, y: 52 },
@@ -46,7 +46,7 @@ const PANELS = [
   },
   {
     id: "p40",
-    image: "/assets/panels/p40.png",
+    image: "/assets/panels/p40.jpeg",
     caption: "Memory keeps the next response faster.",
     hotspots: [
       { id: "m2", key: "memory_cell", label: "CD8 + Cypotoxic T-Cell", x: 52, y: 46 },

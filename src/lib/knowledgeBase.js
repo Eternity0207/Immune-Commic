@@ -24,7 +24,7 @@ export const KNOWLEDGE_BASE = {
     link: "https://en.wikipedia.org/wiki/Antigen",
   },
   macrophage: {
-    title: "T-Helper Cel",
+    title: "T-Helper Cell",
     description:
       "Macrophages engulf pathogens and debris, then present clues that guide adaptive immunity.",
     link: "https://en.wikipedia.org/wiki/T_helper_cell",

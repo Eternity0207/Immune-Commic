@@ -12,8 +12,8 @@ export const TERM_REFERENCES = {
     wikiPage: "Neutrophil",
     fallback: "Antibodies bind specific targets, neutralize pathogens, and tag them for clearance."
   },
-  "T-Helper Cel": {
-    title: "T-Helper Cel",
+  "T-Helper Cell": {
+    title: "T-Helper Cell",
     wikiPage: "T_helper_cell",
     fallback: "Macrophages engulf pathogens and present antigens to help activate adaptive responses."
   },
