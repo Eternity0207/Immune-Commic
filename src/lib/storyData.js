@@ -285,6 +285,72 @@ export const PANELS = [
     caption:
       "Combinatorial and random nucleotide changes generate enormous receptor diversity for future threats.",
   },
+  {
+    number: 49,
+    image: "/assets/panels/p49.jpeg",
+    caption:
+      "Activated immune cells split into effector forces and long-lived memory cells that stay on patrol.",
+  },
+  {
+    number: 50,
+    image: "/assets/panels/p50.jpeg",
+    caption:
+      "Antibodies spark the complement cascade, a plasma defense system that amplifies the attack.",
+  },
+  {
+    number: 51,
+    image: "/assets/panels/p51.jpeg",
+    caption:
+      "Complement proteins coat microbes with C3b, making targets easier for phagocytes to grab.",
+  },
+  {
+    number: 52,
+    image: "/assets/panels/p52.jpeg",
+    caption:
+      "The cascade builds momentum as convertases activate more complement proteins in seconds.",
+  },
+  {
+    number: 53,
+    image: "/assets/panels/p53.jpeg",
+    caption:
+      "The membrane attack complex drills holes in vulnerable microbes to finish the job.",
+  },
+  {
+    number: 54,
+    image: "/assets/panels/p54.jpeg",
+    caption:
+      "Memory B cells remain in lymph nodes, ready to restart antibody factories fast.",
+  },
+  {
+    number: 55,
+    image: "/assets/panels/p55.jpeg",
+    caption:
+      "Memory T cells patrol tissues so secondary responses trigger in hours, not days.",
+  },
+  {
+    number: 56,
+    image: "/assets/panels/p56.jpeg",
+    caption:
+      "A second exposure triggers high-affinity antibodies and a faster coordinated strike.",
+  },
+  {
+    number: 57,
+    image: "/assets/panels/p57.jpeg",
+    caption:
+      "Vaccines train immune memory using safe antigens and immune-boosting adjuvants.",
+  },
+  {
+    number: 58,
+    image: "/assets/panels/p58.jpeg",
+    caption:
+      "Booster doses refresh memory and keep protective antibody levels strong.",
+  },
+  {
+    number: 59,
+    image: "/assets/panels/p59.jpeg",
+    caption:
+      "Immune memory turns hard-won lessons into lifelong protection for Arjun.",
+  },
 ];
 
 export const PANEL_TERMS = {
@@ -336,6 +402,17 @@ export const PANEL_TERMS = {
   46: ["V(D)J Recombination"],
   47: ["V(D)J Recombination", "RAG1", "RAG2"],
   48: ["Receptor Diversity", "Immune Memory"],
+  49: ["Memory Cell", "Clonal Selection"],
+  50: ["Complement"],
+  51: ["Opsonization", "C3b"],
+  52: ["C3 Convertase", "C5 Convertase"],
+  53: ["Membrane Attack Complex"],
+  54: ["Memory Cell", "Plasma Cell"],
+  55: ["Memory Cell", "CD8"],
+  56: ["Affinity Maturation", "Neutralizing Antibodies"],
+  57: ["Vaccine", "Adjuvant"],
+  58: ["Booster Shot"],
+  59: ["Immune Memory"],
 };
 
 export const MID_STORY_QUESTIONS = [
@@ -594,6 +671,78 @@ export const MID_STORY_QUESTIONS = [
     ],
     correctOptionId: "a",
   },
+  {
+    id: "mid-11",
+    insertAfter: 51,
+    prompt: "What does C3b tagging accomplish in the complement cascade?",
+    options: [
+      {
+        id: "a",
+        text: "Marks targets for easier phagocytosis",
+        explanation:
+          "Correct. C3b opsonization makes microbes easier for immune cells to grab.",
+      },
+      {
+        id: "b",
+        text: "Stops antibody production entirely",
+        explanation: "No. Complement works alongside antibodies, not against them.",
+      },
+      {
+        id: "c",
+        text: "Turns off inflammation completely",
+        explanation: "No. Complement actually amplifies inflammatory responses.",
+      },
+    ],
+    correctOptionId: "a",
+  },
+  {
+    id: "mid-12",
+    insertAfter: 55,
+    prompt: "Why are memory cells so important after the first infection?",
+    options: [
+      {
+        id: "a",
+        text: "They trigger faster, stronger responses on re-exposure",
+        explanation:
+          "Correct. Memory cells reduce response time and boost protective strength.",
+      },
+      {
+        id: "b",
+        text: "They replace all innate immune cells",
+        explanation: "No. Innate defenses still operate in every response.",
+      },
+      {
+        id: "c",
+        text: "They prevent any future infections entirely",
+        explanation: "Not entirely. They improve odds but do not guarantee zero infection.",
+      },
+    ],
+    correctOptionId: "a",
+  },
+  {
+    id: "mid-13",
+    insertAfter: 57,
+    prompt: "Why do vaccines often include adjuvants?",
+    options: [
+      {
+        id: "a",
+        text: "They amplify innate signals to build stronger memory",
+        explanation:
+          "Correct. Adjuvants help the immune system pay attention and form durable memory.",
+      },
+      {
+        id: "b",
+        text: "They erase existing antibodies",
+        explanation: "No. Adjuvants are added to strengthen, not erase, responses.",
+      },
+      {
+        id: "c",
+        text: "They make viruses replicate faster",
+        explanation: "No. Adjuvants do not make pathogens replicate.",
+      },
+    ],
+    correctOptionId: "a",
+  },
 ];
 
 export const CHARACTERS = [
@@ -735,5 +884,53 @@ export const FINAL_QUIZ = [
     correctOptionId: "a",
     explanation:
       "Vaccination creates immune memory in a safer learning context.",
+  },
+  {
+    id: "final-7",
+    prompt: "What is the main job of the membrane attack complex (MAC)?",
+    options: [
+      { id: "a", text: "Punch holes in microbial membranes" },
+      { id: "b", text: "Build new antibodies in bone marrow" },
+      { id: "c", text: "Store antigen memory in lymph nodes" },
+    ],
+    correctOptionId: "a",
+    explanation:
+      "MAC forms pores that lyse susceptible microbes during complement attack.",
+  },
+  {
+    id: "final-8",
+    prompt: "Why are booster shots used after vaccination?",
+    options: [
+      { id: "a", text: "To refresh memory and raise antibody levels" },
+      { id: "b", text: "To remove innate immune cells" },
+      { id: "c", text: "To lower immune signaling" },
+    ],
+    correctOptionId: "a",
+    explanation:
+      "Boosters re-stimulate memory cells so protection stays strong over time.",
+  },
+  {
+    id: "final-9",
+    prompt: "What does opsonization help immune cells do?",
+    options: [
+      { id: "a", text: "Grab and ingest tagged microbes faster" },
+      { id: "b", text: "Hide pathogens from recognition" },
+      { id: "c", text: "Turn off antibody binding" },
+    ],
+    correctOptionId: "a",
+    explanation:
+      "Opsonins like C3b or antibodies label targets for easier phagocytosis.",
+  },
+  {
+    id: "final-10",
+    prompt: "What is the hallmark advantage of memory T cells?",
+    options: [
+      { id: "a", text: "They respond quickly to known threats" },
+      { id: "b", text: "They only live for minutes" },
+      { id: "c", text: "They never require activation" },
+    ],
+    correctOptionId: "a",
+    explanation:
+      "Memory T cells shorten response time and improve control on re-exposure.",
   },
 ];

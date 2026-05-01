@@ -246,5 +246,45 @@ export const TERM_REFERENCES = {
     title: "Immune Memory",
     wikiPage: "Immunological_memory",
     fallback: "Immune memory enables faster and stronger responses on re-exposure."
+  },
+  C3b: {
+    title: "C3b",
+    wikiPage: "Complement_component_3",
+    fallback: "C3b is a complement fragment that tags microbes for clearance."
+  },
+  "C3 Convertase": {
+    title: "C3 Convertase",
+    wikiPage: "C3_convertase",
+    fallback: "C3 convertase is the enzyme complex that amplifies complement activation."
+  },
+  "C5 Convertase": {
+    title: "C5 Convertase",
+    wikiPage: "C5_convertase",
+    fallback: "C5 convertase triggers the terminal complement pathway that leads to MAC."
+  },
+  "Membrane Attack Complex": {
+    title: "Membrane Attack Complex (MAC)",
+    wikiPage: "Membrane_attack_complex",
+    fallback: "MAC forms pores in microbial membranes to cause lysis."
+  },
+  "Neutralizing Antibodies": {
+    title: "Neutralizing Antibodies",
+    wikiPage: "Neutralizing_antibody",
+    fallback: "Neutralizing antibodies block pathogens from entering host cells."
+  },
+  Vaccine: {
+    title: "Vaccine",
+    wikiPage: "Vaccine",
+    fallback: "Vaccines train immune memory using safe antigens."
+  },
+  Adjuvant: {
+    title: "Adjuvant",
+    wikiPage: "Adjuvant",
+    fallback: "Adjuvants strengthen immune activation to build durable memory."
+  },
+  "Booster Shot": {
+    title: "Booster Dose",
+    wikiPage: "Booster_dose",
+    fallback: "Booster doses re-stimulate memory cells and sustain protection."
   }
 };

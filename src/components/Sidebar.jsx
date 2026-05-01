@@ -34,6 +34,7 @@ export default function Sidebar({
   onOpenCredits
 }) {
   const [answers, setAnswers] = useState({});
+  const [showCelebration, setShowCelebration] = useState(false);
   const finalQuizSectionRef = useRef(null);
 
   const answeredCount = Object.keys(answers).length;
@@ -43,6 +44,9 @@ export default function Sidebar({
   );
   const hasCompletedQuiz = quizQuestions.length > 0 && answeredCount === quizQuestions.length;
   const quizMessage = getQuizMessage(score, quizQuestions.length);
+  const scorePercent = quizQuestions.length
+    ? Math.round((score / quizQuestions.length) * 100)
+    : 0;
   const shuffledQuizOptionsByQuestion = useMemo(
     () =>
       Object.fromEntries(
@@ -61,7 +65,14 @@ export default function Sidebar({
 
   useEffect(() => {
     setAnswers({});
+    setShowCelebration(false);
   }, [resetSignal]);
+
+  useEffect(() => {
+    if (hasCompletedQuiz) {
+      setShowCelebration(true);
+    }
+  }, [hasCompletedQuiz]);
 
   return (
     <>
@@ -145,7 +156,7 @@ export default function Sidebar({
               </div>
             </>
           ) : (
-            <p className="quiz-locked-message">Complete both chapters with at least 50% to unlock quiz</p>
+            <p className="quiz-locked-message">Complete all three chapters with at least 50% to unlock quiz</p>
           )}
         </section>
 
@@ -219,6 +230,26 @@ export default function Sidebar({
           </article>
         </section>
       </aside>
+
+      {showCelebration ? (
+        <div className="final-quiz-celebration" role="dialog" aria-modal="true">
+          <div className="final-quiz-celebration-card">
+            <p className="final-quiz-celebration-kicker">Final Quiz Complete</p>
+            <h3 className="final-quiz-celebration-score">
+              {score}/{quizQuestions.length}
+            </h3>
+            <p className="final-quiz-celebration-percent">{scorePercent}%</p>
+            <p className="final-quiz-celebration-message">{quizMessage}</p>
+            <button
+              type="button"
+              className="final-quiz-celebration-close"
+              onClick={() => setShowCelebration(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       {isOpen ? (
         <button

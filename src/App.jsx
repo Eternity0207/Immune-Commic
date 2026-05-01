@@ -27,11 +27,23 @@ const CHAPTERS = {
     path: "/chapter-2",
     title: "Chapter 2: The Adaptive Arm Awakens",
     startPanel: 30,
-    endPanel: 48,
+    endPanel: 49,
+  },
+  chapter3: {
+    key: "chapter3",
+    path: "/chapter-3",
+    title: "Chapter 3: Memory and Vaccines",
+    startPanel: 50,
+    endPanel: 59,
   },
 };
 
-const VALID_PATHS = ["/", CHAPTERS.chapter1.path, CHAPTERS.chapter2.path];
+const VALID_PATHS = [
+  "/",
+  CHAPTERS.chapter1.path,
+  CHAPTERS.chapter2.path,
+  CHAPTERS.chapter3.path,
+];
 
 const REVIEW_LINKS = [
   { label: "Neutrophil", href: "https://en.wikipedia.org/wiki/Neutrophil" },
@@ -115,10 +127,12 @@ export default function App() {
   const [chapterScores, setChapterScores] = useState({
     chapter1: {},
     chapter2: {},
+    chapter3: {},
   });
   const [chapterResetKeys, setChapterResetKeys] = useState({
     chapter1: 0,
     chapter2: 0,
+    chapter3: 0,
   });
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showScrollHint, setShowScrollHint] = useState(true);
@@ -171,6 +185,19 @@ export default function App() {
     [],
   );
 
+  const chapter3Panels = useMemo(
+    () =>
+      PANELS.filter(
+        (panel) =>
+          panel.number >= CHAPTERS.chapter3.startPanel &&
+          panel.number <= CHAPTERS.chapter3.endPanel,
+      ).map((panel) => ({
+        ...panel,
+        terms: PANEL_TERMS[panel.number] ?? [],
+      })),
+    [],
+  );
+
   const chapter1Questions = useMemo(
     () =>
       MID_STORY_QUESTIONS.filter(
@@ -191,6 +218,16 @@ export default function App() {
     [],
   );
 
+  const chapter3Questions = useMemo(
+    () =>
+      MID_STORY_QUESTIONS.filter(
+        (question) =>
+          question.insertAfter >= CHAPTERS.chapter3.startPanel &&
+          question.insertAfter <= CHAPTERS.chapter3.endPanel,
+      ),
+    [],
+  );
+
   const chapter1QuestionByPanel = useMemo(
     () => mapQuestionsByPanel(chapter1Questions),
     [chapter1Questions],
@@ -199,11 +236,17 @@ export default function App() {
     () => mapQuestionsByPanel(chapter2Questions),
     [chapter2Questions],
   );
+  const chapter3QuestionByPanel = useMemo(
+    () => mapQuestionsByPanel(chapter3Questions),
+    [chapter3Questions],
+  );
 
   const totalQuestionsChapter1 = chapter1Questions.length;
   const totalQuestionsChapter2 = chapter2Questions.length;
+  const totalQuestionsChapter3 = chapter3Questions.length;
   const chapter1TotalMarks = totalQuestionsChapter1 * 10;
   const chapter2TotalMarks = totalQuestionsChapter2 * 10;
+  const chapter3TotalMarks = totalQuestionsChapter3 * 10;
 
   const chapter1Score = useMemo(
     () =>
@@ -221,12 +264,22 @@ export default function App() {
       ),
     [chapterScores.chapter2],
   );
+  const chapter3Score = useMemo(
+    () =>
+      Object.values(chapterScores.chapter3).reduce(
+        (sum, value) => sum + value,
+        0,
+      ),
+    [chapterScores.chapter3],
+  );
 
   const chapter1Percent = getScorePercent(chapter1Score, chapter1TotalMarks);
   const chapter2Percent = getScorePercent(chapter2Score, chapter2TotalMarks);
+  const chapter3Percent = getScorePercent(chapter3Score, chapter3TotalMarks);
   const chapter1Passed = chapter1Percent >= 50;
   const chapter2Passed = chapter2Percent >= 50;
-  const isFinalQuizUnlocked = chapter1Passed && chapter2Passed;
+  const chapter3Passed = chapter3Percent >= 50;
+  const isFinalQuizUnlocked = chapter1Passed && chapter2Passed && chapter3Passed;
 
   const activeChapter = useMemo(() => {
     if (currentPath === CHAPTERS.chapter1.path) {
@@ -235,6 +288,10 @@ export default function App() {
 
     if (currentPath === CHAPTERS.chapter2.path) {
       return CHAPTERS.chapter2;
+    }
+
+    if (currentPath === CHAPTERS.chapter3.path) {
+      return CHAPTERS.chapter3;
     }
 
     return null;
@@ -251,22 +308,36 @@ export default function App() {
       return chapter2Panels;
     }
 
+    if (activeChapterKey === "chapter3") {
+      return chapter3Panels;
+    }
+
     return [];
-  }, [activeChapterKey, chapter1Panels, chapter2Panels]);
+  }, [activeChapterKey, chapter1Panels, chapter2Panels, chapter3Panels]);
 
   const activeQuestionByPanel =
     activeChapterKey === "chapter1"
       ? chapter1QuestionByPanel
-      : chapter2QuestionByPanel;
+      : activeChapterKey === "chapter2"
+        ? chapter2QuestionByPanel
+        : chapter3QuestionByPanel;
   const activeFinalPanelNumber = activePanels[activePanels.length - 1]?.number;
   const activeChapterResetKey = activeChapterKey
     ? chapterResetKeys[activeChapterKey]
     : 0;
 
   const activeChapterScore =
-    activeChapterKey === "chapter1" ? chapter1Score : chapter2Score;
+    activeChapterKey === "chapter1"
+      ? chapter1Score
+      : activeChapterKey === "chapter2"
+        ? chapter2Score
+        : chapter3Score;
   const activeChapterTotalMarks =
-    activeChapterKey === "chapter1" ? chapter1TotalMarks : chapter2TotalMarks;
+    activeChapterKey === "chapter1"
+      ? chapter1TotalMarks
+      : activeChapterKey === "chapter2"
+        ? chapter2TotalMarks
+        : chapter3TotalMarks;
   const activeChapterScoreMessage = getScoreMessage(
     activeChapterScore,
     activeChapterTotalMarks,
@@ -277,7 +348,9 @@ export default function App() {
   );
 
   const sidebarResetSignal =
-    chapterResetKeys.chapter1 + chapterResetKeys.chapter2;
+    chapterResetKeys.chapter1 +
+    chapterResetKeys.chapter2 +
+    chapterResetKeys.chapter3;
 
   const navigateTo = useCallback((nextPath, { replace = false } = {}) => {
     const normalizedPath = normalizePath(nextPath);
@@ -504,6 +577,15 @@ export default function App() {
     navigateTo(CHAPTERS.chapter2.path);
   }, [chapter1Passed, navigateTo, playSfx]);
 
+  const handleContinueToChapter3 = useCallback(() => {
+    if (!chapter2Passed) {
+      return;
+    }
+
+    playSfx("whoosh", { volume: 0.42 });
+    navigateTo(CHAPTERS.chapter3.path);
+  }, [chapter2Passed, navigateTo, playSfx]);
+
   const handleContinueToStory = useCallback(() => {
     playSfx("whoosh", { volume: 0.45, playbackRate: 0.95 });
     setIsCreditsOpen(false);
@@ -590,6 +672,11 @@ export default function App() {
 
         if (chapterKey === "chapter1") {
           next.chapter2 = {};
+          next.chapter3 = {};
+        }
+
+        if (chapterKey === "chapter2") {
+          next.chapter3 = {};
         }
 
         return next;
@@ -603,6 +690,11 @@ export default function App() {
 
         if (chapterKey === "chapter1") {
           next.chapter2 = previous.chapter2 + 1;
+          next.chapter3 = previous.chapter3 + 1;
+        }
+
+        if (chapterKey === "chapter2") {
+          next.chapter3 = previous.chapter3 + 1;
         }
 
         return next;
@@ -615,7 +707,9 @@ export default function App() {
       navigateTo(
         chapterKey === "chapter1"
           ? CHAPTERS.chapter1.path
-          : CHAPTERS.chapter2.path,
+          : chapterKey === "chapter2"
+            ? CHAPTERS.chapter2.path
+            : CHAPTERS.chapter3.path,
       );
     },
     [navigateTo, playSfx, stopNarration],
@@ -727,6 +821,10 @@ export default function App() {
 
     if (currentPath === CHAPTERS.chapter2.path && !chapter1Passed) {
       navigateTo(CHAPTERS.chapter1.path, { replace: true });
+    }
+
+    if (currentPath === CHAPTERS.chapter3.path && !chapter2Passed) {
+      navigateTo(CHAPTERS.chapter2.path, { replace: true });
     }
   }, [chapter1Passed, currentPath, hasEnteredStory, navigateTo]);
 
@@ -895,16 +993,57 @@ export default function App() {
       );
     }
 
-    const canTakeFinalQuiz = chapter2Passed && isFinalQuizUnlocked;
+    if (activeChapterKey === "chapter2") {
+      return (
+        <div className="comic-end-summary">
+          <p className="comic-end-kicker">Chapter 2 Complete</p>
+          <h3>
+            Score: {chapter2Score}/{chapter2TotalMarks} ({chapter2Percent}%)
+          </h3>
+
+          {chapter2Passed ? (
+            <p className="comic-end-message">{activeChapterScoreMessage}</p>
+          ) : (
+            <p className="chapter-gate-warning">
+              You need at least 50% to proceed
+            </p>
+          )}
+
+          <div className="comic-end-actions">
+            {chapter2Passed ? (
+              <button
+                type="button"
+                className="comic-end-btn"
+                onClick={handleContinueToChapter3}
+              >
+                Continue to Chapter 3
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="comic-end-btn is-secondary"
+                onClick={() => handleRetryChapter("chapter2")}
+              >
+                Retry Chapter 2
+              </button>
+            )}
+          </div>
+
+          {!chapter2Passed ? renderReviewLinks() : null}
+        </div>
+      );
+    }
+
+    const canTakeFinalQuiz = chapter3Passed && isFinalQuizUnlocked;
 
     return (
       <div className="comic-end-summary">
-        <p className="comic-end-kicker">Chapter 2 Complete</p>
+        <p className="comic-end-kicker">Chapter 3 Complete</p>
         <h3>
-          Score: {chapter2Score}/{chapter2TotalMarks} ({chapter2Percent}%)
+          Score: {chapter3Score}/{chapter3TotalMarks} ({chapter3Percent}%)
         </h3>
 
-        {chapter2Passed ? (
+        {chapter3Passed ? (
           <p className="comic-end-message">{activeChapterScoreMessage}</p>
         ) : (
           <p className="chapter-gate-warning">
@@ -922,24 +1061,24 @@ export default function App() {
             Take Final Quiz
           </button>
 
-          {!chapter2Passed ? (
+          {!chapter3Passed ? (
             <button
               type="button"
               className="comic-end-btn is-secondary"
-              onClick={() => handleRetryChapter("chapter2")}
+              onClick={() => handleRetryChapter("chapter3")}
             >
-              Retry Chapter 2
+              Retry Chapter 3
             </button>
           ) : null}
         </div>
 
         {!canTakeFinalQuiz ? (
           <p className="chapter-quiz-lock-note">
-            Complete both chapters with at least 50% to unlock quiz
+            Complete all three chapters with at least 50% to unlock quiz
           </p>
         ) : null}
 
-        {!chapter2Passed ? renderReviewLinks() : null}
+        {!chapter3Passed ? renderReviewLinks() : null}
       </div>
     );
   };
@@ -1050,7 +1189,11 @@ export default function App() {
 
       <section className="chapter-title-banner" aria-label="Current chapter">
         <p className="chapter-title-kicker">
-          {activeChapter?.key === "chapter1" ? "Chapter 1" : "Chapter 2"}
+          {activeChapter?.key === "chapter1"
+            ? "Chapter 1"
+            : activeChapter?.key === "chapter2"
+              ? "Chapter 2"
+              : "Chapter 3"}
         </p>
         <h2>{activeChapter?.title}</h2>
       </section>
