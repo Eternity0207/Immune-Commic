@@ -1,6 +1,6 @@
 import useRevealOnView from "../hooks/useRevealOnView";
 
-export default function Panel({ panel, onTermClick, isNarrationPlaying, onNarrationPlay, onNarrationPause }) {
+export default function Panel({ panel, onTermClick }) {
   const [panelRef, isVisible] = useRevealOnView({ threshold: 0.15, rootMargin: "0px 0px -8% 0px" });
 
   return (
@@ -37,23 +37,6 @@ export default function Panel({ panel, onTermClick, isNarrationPlaying, onNarrat
           ))}
         </div>
       ) : null}
-
-      <button
-        type="button"
-        className={`panel-narration-btn ${isNarrationPlaying ? "is-playing" : ""}`}
-        aria-label={isNarrationPlaying ? `Pause caption narration for panel ${panel.number}` : `Play caption narration for panel ${panel.number}`}
-        onClick={(event) => {
-          event.stopPropagation();
-          if (isNarrationPlaying) {
-            onNarrationPause?.(panel);
-            return;
-          }
-
-          onNarrationPlay?.(panel);
-        }}
-      >
-        {isNarrationPlaying ? "Pause" : "Play"}
-      </button>
     </article>
   );
 }

@@ -806,7 +806,7 @@ img {
   position: relative;
   width: 100%;
   margin: 0 auto;
-  padding: 0.9rem 0.9rem 3.8rem;
+  padding: 0.9rem;
   border: 4px solid var(--border);
   border-radius: 10px;
   background: var(--paper-panel);
@@ -886,36 +886,6 @@ img {
   background: #fff2cc;
 }
 
-.panel-narration-btn {
-  position: absolute;
-  right: 0.85rem;
-  bottom: 0.8rem;
-  border: 2px solid #2a2118;
-  border-radius: 999px;
-  background: #fff3cd;
-  color: #2b2116;
-  font-family: var(--font-heading);
-  font-size: 0.92rem;
-  letter-spacing: 0.02em;
-  line-height: 1;
-  min-width: 92px;
-  padding: 0.45rem 0.82rem;
-  box-shadow: 0 5px 10px rgba(35, 24, 12, 0.2);
-  cursor: pointer;
-  transition:
-    transform 170ms ease,
-    box-shadow 170ms ease,
-    background-color 170ms ease;
-}
-
-.panel-narration-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 7px 12px rgba(35, 24, 12, 0.24);
-}
-
-.panel-narration-btn.is-playing {
-  background: #ffe08e;
-}
 
 .question-block {
   margin: 1rem auto 0;
@@ -1682,13 +1652,7 @@ img {
     font-size: 0.9rem;
   }
 
-  .panel-narration-btn {
-    right: 0.6rem;
-    bottom: 0.58rem;
-    min-width: 84px;
-    font-size: 0.86rem;
-    padding: 0.4rem 0.72rem;
-  }
+
 
   .character-list-item {
     grid-template-columns: 68px 1fr;
