@@ -123,7 +123,11 @@ export default function App() {
   const [activeTermKey, setActiveTermKey] = useState("");
 
   const [quizOpenRequest, setQuizOpenRequest] = useState(0);
-  const [hasEnteredStory, setHasEnteredStory] = useState(false);
+  const [hasEnteredStory, setHasEnteredStory] = useState(() =>
+    typeof window === "undefined"
+      ? false
+      : normalizePath(window.location.pathname) !== "/",
+  );
   const [chapterScores, setChapterScores] = useState({
     chapter1: {},
     chapter2: {},
@@ -351,9 +355,10 @@ export default function App() {
 
   const navigateTo = useCallback((nextPath, { replace = false } = {}) => {
     const normalizedPath = normalizePath(nextPath);
-    const browserPath = "/";
 
     if (typeof window !== "undefined") {
+      const browserPath = normalizedPath;
+
       if (replace) {
         window.history.replaceState({}, "", browserPath);
       } else if (window.location.pathname !== browserPath) {
@@ -364,6 +369,7 @@ export default function App() {
     }
 
     setCurrentPath(normalizedPath);
+    setHasEnteredStory(normalizedPath !== "/");
     setScrollProgress(0);
     setShowScrollHint(true);
   }, []);
@@ -380,11 +386,9 @@ export default function App() {
       return;
     }
 
-    if (window.location.pathname !== "/") {
-      window.history.replaceState({}, "", "/");
-    }
-
-    setCurrentPath("/");
+    const nextPath = normalizePath(window.location.pathname);
+    setCurrentPath(nextPath);
+    setHasEnteredStory(nextPath !== "/");
     setScrollProgress(0);
     setShowScrollHint(true);
   }, []);
@@ -530,19 +534,6 @@ export default function App() {
       return undefined;
     }
 
-    if (window.location.pathname !== "/") {
-      window.history.replaceState({}, "", "/");
-      setCurrentPath("/");
-    }
-
-    return undefined;
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") {
-      return undefined;
-    }
-
     const ambientSources = ["/sounds/piano.mp3", "/sounds/ambient.wav"];
     let sourceIndex = 0;
 
@@ -624,11 +615,6 @@ export default function App() {
   }, [handlePathChange]);
 
   useEffect(() => {
-    if (!hasEnteredStory && currentPath !== "/") {
-      navigateTo("/", { replace: true });
-      return;
-    }
-
     if (currentPath === CHAPTERS.chapter2.path && !chapter1Passed) {
       navigateTo(CHAPTERS.chapter1.path, { replace: true });
     }
@@ -636,7 +622,7 @@ export default function App() {
     if (currentPath === CHAPTERS.chapter3.path && !chapter2Passed) {
       navigateTo(CHAPTERS.chapter2.path, { replace: true });
     }
-  }, [chapter1Passed, currentPath, hasEnteredStory, navigateTo]);
+  }, [chapter1Passed, chapter2Passed, currentPath, navigateTo]);
 
   useEffect(() => {
     if (!hasEnteredStory || !activeChapterKey) {

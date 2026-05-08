@@ -26,7 +26,7 @@ Push this repository to GitHub and import it in Vercel.
 
 - Build command: `npm run build`
 - Output directory: `dist`
-- API endpoint: `/api/tts` (implemented in `api/tts.js`)
+- SPA fallback rewrites are handled in `vercel.json`
 
 No extra backend process is required on Vercel.
 
