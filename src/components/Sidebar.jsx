@@ -49,9 +49,10 @@ export default function Sidebar({
     : 0;
   const shuffledQuizOptionsByQuestion = useMemo(
     () =>
-      Object.fromEntries(
-        quizQuestions.map((question) => [question.id, shuffleOptions(question.options)])
-      ),
+      quizQuestions.reduce((accumulator, question) => {
+        accumulator[question.id] = shuffleOptions(question.options);
+        return accumulator;
+      }, {}),
     [quizQuestions]
   );
 

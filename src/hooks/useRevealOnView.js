@@ -10,6 +10,11 @@ export default function useRevealOnView({ threshold = 0.2, rootMargin = "0px 0px
       return undefined;
     }
 
+    if (typeof IntersectionObserver === "undefined") {
+      setIsVisible(true);
+      return undefined;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
