@@ -30,6 +30,14 @@ Push this repository to GitHub and import it in Vercel.
 
 No extra backend process is required on Vercel.
 
+## Netlify Deployment
+
+If you deploy on Netlify instead, use the same build output.
+
+- Build command: `npm run build`
+- Publish directory: `dist`
+- SPA fallback rewrites are handled in `netlify.toml`
+
 ## Build (Optional)
 
 ```bash
